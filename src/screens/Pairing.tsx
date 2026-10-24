@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { isValidCode, newPairingCode, normalizeCode, savePairing } from '../session';
 import { navigate } from '../router';
+import { useLang } from '../i18n';
 
 // Screen B: both devices. The elder's device makes a code; the relative types it in.
 export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
@@ -8,17 +9,14 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
   const [code] = useState(newPairingCode);
   const [input, setInput] = useState('');
   const entered = normalizeCode(input);
+  const { t } = useLang();
 
   if (mode === 'elder') {
     return (
       <main className="screen">
-        <h1>您的配对码 · Your pairing code</h1>
-        <p className="hint">
-          请把这个码告诉您的家人。
-          <br />
-          Give this code to a family member.
-        </p>
-        <p className="code" aria-label={`Pairing code ${code.split('').join(' ')}`}>
+        <h1>{t('yourCode')}</h1>
+        <p className="hint">{t('giveCode')}</p>
+        <p className="code" aria-label={`${t('pairingCodeIs')} ${code.split('').join(' ')}`}>
           {code}
         </p>
         <button
@@ -28,10 +26,10 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
             navigate(`/elder?session=${code}`);
           }}
         >
-          继续 · Continue
+          {t('continue')}
         </button>
         <button className="btn btn--link" onClick={() => setMode('choose')}>
-          返回 · Back
+          {t('back')}
         </button>
       </main>
     );
@@ -40,7 +38,7 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
   if (mode === 'family') {
     return (
       <main className="screen">
-        <h1>输入配对码 · Enter pairing code</h1>
+        <h1>{t('enterCode')}</h1>
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -60,11 +58,11 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
             autoFocus
           />
           <button className="btn btn--primary" type="submit" disabled={!isValidCode(entered)}>
-            配对 · Pair
+            {t('pair')}
           </button>
         </form>
         <button className="btn btn--link" onClick={() => setMode('choose')}>
-          返回 · Back
+          {t('back')}
         </button>
       </main>
     );
@@ -73,28 +71,19 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
   return (
     <main className="screen">
       <header className="hero">
-        <h1 className="hero__title">
-          应用安全检查
-          <span>Scam App Check</span>
-        </h1>
-        <p className="hint">
-          收到陌生的投资应用或链接？先检查一下，家人也能看到结果。
-          <br />
-          Got an unfamiliar investment app or link? Check it first, and your family sees the result too.
-        </p>
+        <h1 className="hero__title">{t('appName')}</h1>
+        <p className="hint">{t('tagline')}</p>
       </header>
       {invalidLink && (
         <p className="error" role="alert">
-          这个链接里的配对码无效，请重新配对。 · The pairing code in this link isn’t valid. Please pair again.
+          {t('invalidLink')}
         </p>
       )}
       <button className="btn btn--primary btn--big" onClick={() => setMode('elder')}>
-        我要检查应用
-        <small>I want to check an app</small>
+        {t('iCheckApp')}
       </button>
       <button className="btn btn--secondary btn--big" onClick={() => setMode('family')}>
-        我是家人
-        <small>I'm a family member</small>
+        {t('iAmFamily')}
       </button>
     </main>
   );

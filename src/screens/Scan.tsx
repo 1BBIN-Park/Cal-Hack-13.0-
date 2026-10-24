@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTable } from 'spacetimedb/react';
 import { tables } from '../module_bindings';
 import { VerdictCard, sortNewestFirst } from '../components/VerdictCard';
+import { useLang, type StringKey } from '../i18n';
 
 // Sophia's analysis service. The /analyze path and form field names are
 // Anthony's assumption until Sophia's service exists (see HACK.md status log).
@@ -11,7 +12,7 @@ type Status =
   | { kind: 'idle' }
   | { kind: 'uploading' }
   | { kind: 'waiting'; knownIds: Set<bigint> }
-  | { kind: 'error'; message: string };
+  | { kind: 'error'; key: StringKey; detail?: string };
 
 const RESULT_TIMEOUT_MS = 60_000;
 
@@ -51,6 +52,7 @@ export function Scan({ session }: { session: string }) {
   const verdicts = sortNewestFirst(verdictRows);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const fileInput = useRef<HTMLInputElement>(null);
+  const { t } = useLang();
 
   // A verdict that wasn't there when we uploaded is this upload's result.
   const fresh =
@@ -68,7 +70,7 @@ export function Scan({ session }: { session: string }) {
   useEffect(() => {
     if (status.kind !== 'waiting') return;
     const timer = setTimeout(
-      () => setStatus({ kind: 'error', message: '还没有结果，请再试一次 · No result yet, please try again.' }),
+      () => setStatus({ kind: 'error', key: 'noResult' }),
       RESULT_TIMEOUT_MS
     );
     return () => clearTimeout(timer);
@@ -78,7 +80,7 @@ export function Scan({ session }: { session: string }) {
   // analysis; links get URL/redirect checks only, never an APK download.
   async function submit(path: string, init: RequestInit) {
     if (!ANALYSIS_URL) {
-      setStatus({ kind: 'error', message: 'Analysis service not connected (VITE_ANALYSIS_URL unset).' });
+      setStatus({ kind: 'error', key: 'notConnected' });
       return;
     }
     const knownIds = new Set(verdicts.map(v => v.id));
@@ -88,7 +90,7 @@ export function Scan({ session }: { session: string }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus({ kind: 'waiting', knownIds });
     } catch (err) {
-      setStatus({ kind: 'error', message: `Send failed: ${(err as Error).message}` });
+      setStatus({ kind: 'error', key: 'sendFailed', detail: (err as Error).message });
     }
   }
 
@@ -136,8 +138,10 @@ export function Scan({ session }: { session: string }) {
 
   return (
     <main className="screen">
-      <p className="session-tag">配对码 · Code: {session}</p>
-      <h1>检查应用 · Check an app</h1>
+      <p className="session-tag">
+        {t('code')}: {session}
+      </p>
+      <h1>{t('checkAnApp')}</h1>
 
       <input
         ref={fileInput}
@@ -155,8 +159,7 @@ export function Scan({ session }: { session: string }) {
         disabled={busy}
         onClick={() => fileInput.current?.click()}
       >
-        选择安装包 (APK)
-        <small>Choose an APK file</small>
+        {t('chooseApk')}
       </button>
 
       <form
@@ -166,9 +169,9 @@ export function Scan({ session }: { session: string }) {
           if (linkUrl && !busy) checkLink(linkUrl);
         }}
       >
-        <label htmlFor="link">或粘贴链接 · Or paste a link</label>
+        <label htmlFor="link">{t('orPasteLink')}</label>
         <p className="hint link-hint" id="link-hint">
-          可以粘贴整条短信 · Pasting the whole message is OK
+          {t('wholeMessageOk')}
         </p>
         {/* textarea, not input: an <input> strips line breaks from pasted
             messages, gluing "https://evil.top." onto the next line's words. */}
@@ -185,33 +188,36 @@ export function Scan({ session }: { session: string }) {
           spellCheck={false}
         />
         {linkUrl && link.trim() !== linkUrl && (
-          <p className="hint link-preview">将检查 · Will check: {linkUrl}</p>
+          <p className="hint link-preview">
+            {t('willCheck')} {linkUrl}
+          </p>
         )}
         <button className="btn btn--secondary" type="submit" disabled={!linkUrl || busy}>
-          检查链接 · Check link
+          {t('checkLink')}
         </button>
       </form>
 
       {sending && (
         <div className="loading" role="status">
           <span className="spinner" aria-hidden />
-          正在检查，请稍候… · Checking, please wait…
+          {t('checking')}
         </div>
       )}
       {status.kind === 'error' && (
         <p className="error" role="alert">
-          {status.message}
+          {t(status.key)}
+          {status.detail && ` ${status.detail}`}
         </p>
       )}
 
       <section aria-live="polite" ref={resultRef} className="result">
         {!ready ? null : latest ? (
           <>
-            <h2>{sending ? '上次检查 · Last check' : '检查结果 · Result'}</h2>
+            <h2>{sending ? t('lastCheck') : t('result')}</h2>
             <VerdictCard verdict={latest} large />
           </>
         ) : (
-          !sending && <p className="empty">还没有检查记录 · No checks yet</p>
+          !sending && <p className="empty">{t('noChecks')}</p>
         )}
       </section>
     </main>

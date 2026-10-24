@@ -225,3 +225,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   scam SMS), now a textarea (an <input> stripped line breaks and could glue "evil.top." onto
   "click"), and accepts #text=<shared SMS> for the Android app (prefill only, elder taps Check).
   Sophia: lowercase URLs in /analyze-url (HTTPS://… can arrive uppercase).
+- 10:45 Sat Anthony: UI now shows ONE language per device with a 中文/English toggle (remembered
+  per phone; Claude still writes both explanations, contract unchanged). Demo: set the elder
+  phone to 中文, the family phone to English, so both languages still show. Rule reasons are
+  English-only. Sophia: OK for the pitch? (MVP text says "bilingual warning" on device A.)

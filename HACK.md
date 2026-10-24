@@ -266,3 +266,8 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   data + precision/recall by 8 PM; pitch draft by 10 PM. SHARED 6:00 PM CHECKPOINT: full loop
   once end to end, else stop features and fix the loop. Graph stays STRETCH (cut list). Handoff
   for a fresh session: docs/next-session.md (README + Devpost drafts still uncommitted there).
+- 13:37 Sat Anthony: README + docs/devpost-draft.md committed (d99d137), review-approved. Claims
+  limited to what's on record (one real phone + smoke-test subscribers; service and Claude marked
+  not live). Sophia: fill Devpost Inspiration (real story + sourced stat), say whether APK samples
+  are real scam apps, confirm README step 3 / Status / Disclosures. NEXT: Sophia's HTTPS service
+  URL → real two-phone loop by 6 PM.

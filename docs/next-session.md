@@ -40,7 +40,8 @@ rehearse.
 | Correlation graph visualization | **STRETCH on the HACK.md cut list.** Only after the 6 PM loop works; her data arrives ~8 PM |
 
 ## What to do next, in order
-1. **Finish and commit the README + Devpost draft** (uncommitted on disk; see "Unfinished" below).
+1. ~~Finish and commit the README + Devpost draft~~ Done Sat 13:37 (d99d137). Sophia's items left
+   in brackets (see "Unfinished" below).
 2. **When Sophia sends her service URL** (must be HTTPS; a page served over HTTPS can't call http):
    set `VITE_ANALYSIS_URL`, run the real loop on two devices (paste the fake-Fidelity SMS on the
    elder screen → verdict + Claude text on the family screen), rebuild and redeploy the Netlify
@@ -104,30 +105,16 @@ rehearse.
 - Local dev: `spacetime start` + dev DB `scamguard-7xwfd`; Vite on :5173.
 
 ## Unfinished at handoff
-Both files below are **untracked** (never committed): `git clean` or a reset would delete them,
-and if Sophia pushes her own README.md, `git pull` will refuse until ours is moved aside.
-
-**README.md** (untracked; live/planned fixes applied, not yet re-reviewed). Still to do:
-- Sophia to confirm the "How it works" step 3, the Status rows and the disclosures (her area),
-  and whether APK samples are real scam apps or self-built scam-pattern samples.
-- Status table: her report says the rules engine is done and tested; update the rows once that
-  is in the repo.
-
-**docs/devpost-draft.md** (untracked; reviewer findings NOT yet applied). Fix before committing:
-- Mark as [NOT LIVE YET], or reword until the loop works: the tagline "Rules decide the risk;
-  Claude explains it"; "The Python analysis service writes a verdict with one HTTP call…";
-  Accomplishments "Rules decide, Claude explains…" (point it at the labeled UI only).
-- "The live two-phone sync works on real phones" is not on record (one real phone + Node
-  subscribers were tested). Reword, or run a two-phone test and log it.
-- "a separate review agent checking every commit before it landed": change to "a Claude Code
-  review subagent checked Anthony's commits before they landed" (Sophia's web commits weren't).
-- Remove unsourced claims ("a named target", "often isolated") or cite a source (FBI IC3, FTC,
-  news); Sophia owns this narrative.
-- Add a "Where Claude could go wrong" line (softened warnings, mistranslated urgency): Anthropic
-  criterion 4. Add "small sample set, accuracy indicative only" and "rule reasons English-only"
-  to Disclosures.
-- Demo link wording: say "a link that starts with 'apple.com'" (it's `аpple.com-verify.top`).
-- Name the Claude model as Haiku (Sophia's plan).
+README.md and docs/devpost-draft.md are committed (d99d137, plan-reviewer APPROVE). Left open,
+mostly Sophia's area, marked in [brackets] in the docs:
+- Project name: "[name TBD together]" in the Devpost draft (both of us).
+- Devpost Inspiration: real-person story + a sourced statistic (FBI IC3, FTC, news).
+- Whether the APK samples are real scam apps or self-built scam-pattern samples (README Disclosures).
+- README "How it works" step 3, Status rows, Disclosures: her confirmation; update the rules-engine
+  row once it's in the repo.
+- Once the loop really works: remove [NOT LIVE YET] markers (Devpost tagline, What it does, How we
+  built it, Disclosures) and the "not live yet" text in README; a two-phone test must be logged
+  before either doc says "two phones".
 
 ## Open questions for Sophia
 - Her HTTPS service URL and when it'll be up (needed for the 6 PM loop).

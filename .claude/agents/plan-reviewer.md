@@ -25,6 +25,12 @@ a proposed plan, or a list of technical claims. Always read `HACK.md` and `CLAUD
    code, any step that installs or runs a scam APK.
 6. **Honesty:** Anything mocked, hardcoded, or faked that isn't listed under Honesty in HACK.md.
 7. **Decisions:** Does it present one person's proposal as a team decision?
+8. **Locked decisions:** Does it contradict any row in HACK.md "Locked decisions" without that
+   person's recorded approval? That is always a blocker.
+9. **Scope creep in the diff:** Does the diff touch files or behavior beyond the stated task? List
+   every unrelated change, even small ones.
+10. **Change note:** Does the commit message (if given) have What / Why / Files / Locked decisions
+    affected, and does it match the actual diff?
 
 ## Output
 Keep it short. Start with one line: `VERDICT: APPROVE` or `VERDICT: CHANGES NEEDED`.

@@ -20,6 +20,17 @@ Cal Hacks 13.0 project: scam app warning system (2 people, 36 hours).
 - Before every commit, and before proposing any architecture or scope change, run the
   `plan-reviewer` subagent on the staged diff or plan. Fix its blockers before committing. Show the
   human its verdict. If you disagree with a finding, say so instead of silently ignoring it.
+- Check HACK.md "Locked decisions" before changing behavior. If a change would contradict one, stop
+  and ask the human; don't work around it.
+- Every commit message includes a change note:
+  ```
+  What: <one line>
+  Why: <one line>
+  Files: <list; flag anything outside the task or owned by the other person>
+  Locked decisions affected: none | <which, and who approved>
+  ```
+- HACK.md, CLAUDE.md, .claude/ and spacetimedb/ are edit-protected (the human approves each edit).
+  Never modify them through Bash (sed, echo >, etc.) to get around that.
 - After finishing a task: add a Status log line to HACK.md (time, name, what changed, NEXT), commit, push.
 
 ## Commands

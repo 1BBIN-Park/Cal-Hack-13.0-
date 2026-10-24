@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "ask": [
+      "Edit(/HACK.md)",
+      "Edit(/CLAUDE.md)",
+      "Edit(/.claude/**)",
+      "Edit(/spacetimedb/**)"
+    ]
+  }
+}

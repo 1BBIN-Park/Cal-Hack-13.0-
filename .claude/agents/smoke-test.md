@@ -23,6 +23,7 @@ with file:line when you can find it (read `spacetimedb/src/index.ts`, `src/modul
   (session_id, app_name, risk_level, reasons, explanation_en, explanation_zh).
 - "subscriber got verdict live" / "filtered out other session": column renames, or a broken
   session_id filter.
-Repeat the INFO line about anonymous callers as-is. Don't call it a failure: the identity check is
-still PENDING in HACK.md.
+- "rejected" / "owner sets service identity" / "saw no fake verdicts": the identity lock in
+  `spacetimedb/src/index.ts` (config table, `set_service_identity`, check in `report_verdict`).
+  Any of these failing is a SECURITY regression: say so first.
 Don't suggest fixes outside what the failures show. Keep it short.

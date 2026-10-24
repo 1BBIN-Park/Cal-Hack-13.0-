@@ -64,9 +64,11 @@ table verdict {
   timestamp: Timestamp      // set inside the reducer from ctx.timestamp, not passed by caller
 }
 reducer report_verdict(...)  // called by Sophia's pipeline
-  // reject callers whose identity isn't the analysis service's (token from POST /v1/identity),
-  // otherwise anyone who knows the DB name can insert fake verdicts.
-  // PROPOSED (Anthony): hardcode the service identity hex in the module. Simplest; Sophia to confirm.
+  // rejects callers whose identity isn't the analysis service's (token from POST /v1/identity).
+  // Sophia OK'd locking to her identity (Slack, Sat 00:54, relayed by Anthony).
+  // Design PROPOSED by Anthony, Sophia to ack: private config table; the publisher is the DB
+  // owner and authorizes her identity via set_service_identity(hex) (no hex in the public
+  // repo); until then her calls get HTTP 530.
 ```
 
 ## Cut list
@@ -127,9 +129,9 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 - Test APKs may be self-built "scam-pattern" samples, not real malware. Say which.
 - Small sample set, so precision/recall numbers are indicative only
 - Claude may mistranslate urgency or soften a warning (known failure mode)
-- Until the identity check lands, report_verdict accepts any caller, even with no token (tested).
-  Must be fixed before the demo DB on Maincloud: the DB name ships in the web bundle, so anyone
-  at the expo could insert fake verdicts. (Proposed by Anthony; Sophia to agree.)
+- report_verdict is locked to the service identity in code (smoke-tested), but the existing test DB
+  scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
+  publish with the service authorized.
 - Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
@@ -203,3 +205,14 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   bindings fresh, publish, HTTP report_verdict, 2 live subscribers, session filter) and a
   `smoke-test` subagent that runs it. Passes now. Run it after touching spacetimedb/ or bindings.
   NEXT: identity check (needs Sophia's Maincloud identity); wire Scan to Sophia's service.
+- 03:00 Sat Anthony (logged 09:30, Claude while Anthony was away): design pass: verdict card labels
+  "AI explanation (Claude)" vs "Found by rules", offline banner with auto-reconnect, invalid-code
+  and empty states. Verified with 375px/dark screenshots, 12/12 UI flow test, drop/reconnect test.
+- 09:30 Sat Anthony: SECURITY: py/.env with a real SPACETIME_TOKEN was committed (dfb7fcc). The
+  identity Sophia sent (c200f486…03f6) belongs to that token, so it is BURNED and must never be
+  authorized. Sophia: mint a new token, keep it only locally, remove py/.env, send the new hex.
+  Built the identity lock (Sophia OK'd locking; the config table + owner-only
+  set_service_identity design is Anthony's PROPOSAL, Sophia: please ack). Smoke test now 17
+  checks incl. impostor/anonymous rejection. Sophia confirmed endpoints (/analyze, /analyze-url)
+  and will handle CORS (Slack, relayed). NEXT: fresh Maincloud demo DB once new hex arrives;
+  wire Scan to Sophia's service.

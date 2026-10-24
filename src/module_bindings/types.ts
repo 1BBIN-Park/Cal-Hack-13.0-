@@ -10,6 +10,13 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
+export const Config = __t.object("Config", {
+  id: __t.u32(),
+  owner: __t.identity(),
+  serviceHex: __t.string(),
+});
+export type Config = __Infer<typeof Config>;
+
 export const Verdict = __t.object("Verdict", {
   id: __t.u64(),
   sessionId: __t.string(),

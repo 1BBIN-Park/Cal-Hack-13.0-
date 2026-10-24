@@ -7,6 +7,8 @@ import { type Infer as __Infer } from "spacetimedb";
 
 // Import all reducer arg schemas
 import ReportVerdictReducer from "../report_verdict_reducer";
+import SetServiceIdentityReducer from "../set_service_identity_reducer";
 
 export type ReportVerdictParams = __Infer<typeof ReportVerdictReducer>;
+export type SetServiceIdentityParams = __Infer<typeof SetServiceIdentityReducer>;
 

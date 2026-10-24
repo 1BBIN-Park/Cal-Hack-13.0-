@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # End-to-end smoke test of the verdict path, LOCAL server only:
-#   build -> publish to a throwaway DB -> report_verdict over HTTP (like Sophia's
-#   pipeline) -> two live subscribers (elder + family) -> session filtering.
+#   build -> publish to a throwaway DB -> lock report_verdict to a service identity ->
+#   report_verdict over HTTP (like Sophia's pipeline) -> two live subscribers
+#   (elder + family) -> session filtering; impostors and anonymous callers rejected.
 # Never touches Maincloud or the dev DB. Prints PASS/FAIL per check; exits 1 on any FAIL.
 # Usage: scripts/smoke-test.sh
 set -uo pipefail
@@ -21,7 +22,7 @@ pass() { echo "PASS  $1"; }
 fail() { echo "FAIL  $1"; FAILS=$((FAILS + 1)); }
 
 cleanup() {
-  "$SPACETIME" delete --server "$SERVER" -y "$DB" >/dev/null 2>&1
+  "$SPACETIME" delete --no-config --server "$SERVER" -y "$DB" >/dev/null 2>&1
   if [ -n "$STARTED_SERVER" ]; then kill "$STARTED_SERVER" 2>/dev/null; wait "$STARTED_SERVER" 2>/dev/null; fi
   rm -rf "$WORK"
 }
@@ -53,7 +54,7 @@ fi
 if curl -sf -o /dev/null "$HOST_HTTP/v1/ping"; then pass "local server reachable"; else fail "local server reachable"; exit 1; fi
 
 # 4. Publish module to a throwaway DB
-if "$SPACETIME" publish --server "$SERVER" --module-path spacetimedb -y "$DB" >"$WORK/publish.log" 2>&1; then
+if "$SPACETIME" publish --no-config --server "$SERVER" --module-path spacetimedb -y "$DB" >"$WORK/publish.log" 2>&1; then
   pass "module publishes ($DB)"
 else
   fail "module publishes"; tail -5 "$WORK/publish.log" | sed 's/^/      /'; exit 1
@@ -71,16 +72,35 @@ for _ in $(seq 1 20); do
   sleep 0.25
 done
 
-# 6. Pipeline-style HTTP calls: one for SMOKE2, one for another session
-TOKEN=$(curl -sf -X POST "$HOST_HTTP/v1/identity" | python3 -c 'import json,sys;print(json.load(sys.stdin)["token"])' 2>/dev/null)
-[ -n "$TOKEN" ] && pass "mint identity token" || fail "mint identity token"
-call() {
-  curl -s -o /dev/null -w '%{http_code}' -X POST "$HOST_HTTP/v1/database/$DB/call/report_verdict" \
-    -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d "$1"
+# 6. Identity lock + pipeline-style HTTP calls (like Sophia's service)
+MINT=$(curl -sf -X POST "$HOST_HTTP/v1/identity")
+TOKEN=$(echo "$MINT" | python3 -c 'import json,sys;print(json.load(sys.stdin)["token"])' 2>/dev/null)
+SVC_HEX=$(echo "$MINT" | python3 -c 'import json,sys;print(json.load(sys.stdin)["identity"])' 2>/dev/null)
+[ -n "$TOKEN" ] && [ -n "$SVC_HEX" ] && pass "mint service identity token" || fail "mint service identity token"
+rejected() { [ -n "$1" ] && [ "$1" != 200 ] && [ "$1" != 000 ]; }
+call() { # call <reducer> <json-args> [token]
+  local auth=(); [ -n "${3:-}" ] && auth=(-H "Authorization: Bearer $3")
+  curl -s -o /dev/null -w '%{http_code}' -X POST "$HOST_HTTP/v1/database/$DB/call/$1" \
+    ${auth[@]+"${auth[@]}"} -H 'Content-Type: application/json' -d "$2"
 }
-CODE=$(call '["SMOKE2","Smoke App","high",["reason one","reason two"],"Smoke test warning.","烟雾测试警告。"]')
-[ "$CODE" = 200 ] && pass "report_verdict over HTTP (200)" || fail "report_verdict over HTTP (got $CODE)"
-call '["OTHER3","Other App","low",[],"Other session.","其他会话。"]' >/dev/null
+VERDICT='["SMOKE2","Smoke App","high",["reason one","reason two"],"Smoke test warning.","烟雾测试警告。"]'
+CODE=$(call report_verdict "$VERDICT" "$TOKEN")
+rejected "$CODE" && pass "report_verdict rejected before service is set ($CODE)" || fail "report_verdict rejected before service is set"
+CODE=$(call set_service_identity "[\"$SVC_HEX\"]" "$TOKEN")
+rejected "$CODE" && pass "non-owner can't set service identity ($CODE)" || fail "non-owner can't set service identity"
+if "$SPACETIME" call --no-config --server "$SERVER" -y "$DB" set_service_identity "$SVC_HEX" >"$WORK/setsvc.log" 2>&1; then
+  pass "owner sets service identity (spacetime call)"
+else
+  fail "owner sets service identity"; sed 's/^/      /' "$WORK/setsvc.log" | head -5
+fi
+CODE=$(call report_verdict "$VERDICT" "$TOKEN")
+[ "$CODE" = 200 ] && pass "service report_verdict over HTTP (200)" || fail "service report_verdict over HTTP (got $CODE)"
+call report_verdict '["OTHER3","Other App","low",[],"Other session.","其他会话。"]' "$TOKEN" >/dev/null
+CODE=$(call report_verdict '["SMOKE2","Fake","high",[],"anon","匿名"]')
+rejected "$CODE" && pass "anonymous report_verdict rejected ($CODE)" || fail "anonymous report_verdict rejected"
+OTHER_TOKEN=$(curl -sf -X POST "$HOST_HTTP/v1/identity" | python3 -c 'import json,sys;print(json.load(sys.stdin)["token"])' 2>/dev/null)
+CODE=$(call report_verdict '["SMOKE2","Fake","high",[],"impostor","冒充"]' "$OTHER_TOKEN")
+rejected "$CODE" && pass "other identity's report_verdict rejected ($CODE)" || fail "other identity's report_verdict rejected"
 # Only the subscribers: a bare `wait` would also wait on a server we started.
 wait "$ELDER" "$FAMILY"
 
@@ -93,16 +113,8 @@ for who in elder family; do
     fail "$who subscriber got verdict live"; sed 's/^/      /' "$LOG" | head -5
   fi
   if grep -q OTHER3 "$LOG"; then fail "$who subscriber filtered out other session"; else pass "$who subscriber filtered out other session"; fi
+  if grep -q '"app":"Fake"' "$LOG"; then fail "$who subscriber got a rejected fake verdict"; else pass "$who subscriber saw no fake verdicts"; fi
 done
-
-# 8. Info only: does report_verdict reject anonymous callers yet? (identity check, PENDING)
-ANON=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$HOST_HTTP/v1/database/$DB/call/report_verdict" \
-  -H 'Content-Type: application/json' -d '["ANON9","Anon","low",[],"anon","匿名"]')
-if [ "$ANON" = 200 ]; then
-  echo "INFO  anonymous report_verdict ACCEPTED (identity check not in place yet)"
-else
-  echo "INFO  anonymous report_verdict rejected (HTTP $ANON)"
-fi
 
 echo
 if [ "$FAILS" -eq 0 ]; then echo "SMOKE TEST: PASS"; else echo "SMOKE TEST: FAIL ($FAILS)"; exit 1; fi

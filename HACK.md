@@ -261,3 +261,8 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   account; manual deploys from a local build). Points at the locked demo DB (empty until
   Sophia's pipeline writes). Final build needs Sophia's HTTPS service URL. Idea for future work
   (not now): Vietnamese/Spanish would need a verdict-contract change for Claude's explanations.
+- 13:20 Sat Anthony: Sophia's checkpoint plan (Slack 12:14, relayed): Claude/Haiku layer by 1:30
+  PM; her service on /analyze + /analyze-url writing via report_verdict by 6:00 PM (HARD); graph
+  data + precision/recall by 8 PM; pitch draft by 10 PM. SHARED 6:00 PM CHECKPOINT: full loop
+  once end to end, else stop features and fix the loop. Graph stays STRETCH (cut list). Handoff
+  for a fresh session: docs/next-session.md (README + Devpost drafts still uncommitted there).

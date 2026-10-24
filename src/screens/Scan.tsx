@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTable } from 'spacetimedb/react';
 import { tables } from '../module_bindings';
 import { VerdictCard, sortNewestFirst } from '../components/VerdictCard';
+import { useLang, type StringKey } from '../i18n';
+import { extractLink, type ExtractedLink } from '../links';
 
 // Sophia's analysis service. The /analyze path and form field names are
 // Anthony's assumption until Sophia's service exists (see HACK.md status log).
@@ -11,34 +13,9 @@ type Status =
   | { kind: 'idle' }
   | { kind: 'uploading' }
   | { kind: 'waiting'; knownIds: Set<bigint> }
-  | { kind: 'error'; message: string };
+  | { kind: 'error'; key: StringKey; detail?: string };
 
 const RESULT_TIMEOUT_MS = 60_000;
-
-// Elders paste whole SMS messages or bare domains, so pull out the first URL
-// and add a scheme when it's missing.
-export function extractUrl(input: string): string | null {
-  // Cap the work on huge pastes (the join regex is quadratic on junk input).
-  const text = input.slice(0, 4000);
-  // Text copied out of a screenshot (iPhone Live Text) keeps the visual line
-  // breaks, splitting links like "https://fideitly-\nintenrational.top/\n...".
-  // Rejoin only when the next line itself looks like URL text (lowercase start
-  // and a connector, or nothing else on the line), so "https://evil.top.\nclick
-  // to confirm" stays evil.top and a following sentence isn't glued on.
-  let joined = text;
-  for (let prev = ''; prev !== joined; ) {
-    prev = joined;
-    joined = joined.replace(
-      /([Hh][Tt][Tt][Pp][Ss]?:\/\/\S*[-/.?=&])[ \t]*\r?\n[ \t]*(?=[a-z0-9]\S*(?:[-/.?=&]|[ \t]*(?:\r?\n|$)))/,
-      '$1'
-    );
-  }
-  // ASCII URL characters only: Chinese SMS text has no spaces to end the URL.
-  const withScheme = joined.match(/https?:\/\/[A-Za-z0-9\-._~:/?#[\]@!$&*+;=%]+/i);
-  if (withScheme) return withScheme[0].replace(/[.,;:!?)\]]+$/, '');
-  const bare = text.match(/\b[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}\b(\/[^\s<>"']*)?/i);
-  return bare ? `https://${bare[0]}` : null;
-}
 
 function sharedText(): string | null {
   return new URLSearchParams(window.location.hash.slice(1)).get('text');
@@ -51,6 +28,7 @@ export function Scan({ session }: { session: string }) {
   const verdicts = sortNewestFirst(verdictRows);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const fileInput = useRef<HTMLInputElement>(null);
+  const { t } = useLang();
 
   // A verdict that wasn't there when we uploaded is this upload's result.
   const fresh =
@@ -68,7 +46,7 @@ export function Scan({ session }: { session: string }) {
   useEffect(() => {
     if (status.kind !== 'waiting') return;
     const timer = setTimeout(
-      () => setStatus({ kind: 'error', message: '还没有结果，请再试一次 · No result yet, please try again.' }),
+      () => setStatus({ kind: 'error', key: 'noResult' }),
       RESULT_TIMEOUT_MS
     );
     return () => clearTimeout(timer);
@@ -78,7 +56,7 @@ export function Scan({ session }: { session: string }) {
   // analysis; links get URL/redirect checks only, never an APK download.
   async function submit(path: string, init: RequestInit) {
     if (!ANALYSIS_URL) {
-      setStatus({ kind: 'error', message: 'Analysis service not connected (VITE_ANALYSIS_URL unset).' });
+      setStatus({ kind: 'error', key: 'notConnected' });
       return;
     }
     const knownIds = new Set(verdicts.map(v => v.id));
@@ -88,7 +66,7 @@ export function Scan({ session }: { session: string }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus({ kind: 'waiting', knownIds });
     } catch (err) {
-      setStatus({ kind: 'error', message: `Send failed: ${(err as Error).message}` });
+      setStatus({ kind: 'error', key: 'sendFailed', detail: (err as Error).message });
     }
   }
 
@@ -99,15 +77,24 @@ export function Scan({ session }: { session: string }) {
     submit('/analyze', { body });
   }
 
-  function checkLink(url: string) {
+  // `message` (optional, agreed with Sophia): the whole pasted text, so her
+  // rules can score the sender, urgency wording and the "reply Y" trick, and
+  // Claude can explain them. Omitted when the paste is just the link.
+  function checkLink(link: ExtractedLink, pasted: string) {
+    const normalized = pasted.normalize('NFKC').replace(/\u3002/g, '.');
+    const besidesLink = [link.written, link.written.replace(/^https?:\/\//i, '')]
+      .reduce((text, form) => text.replace(form, ''), normalized)
+      .replace(/[\s\p{P}]/gu, '');
+    // Cap by code points so an emoji isn't split in half.
+    const message = Array.from(pasted.trim()).slice(0, 4000).join('');
     submit('/analyze-url', {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, session_id: session }),
+      body: JSON.stringify({ url: link.url, session_id: session, ...(besidesLink ? { message } : {}) }),
     });
   }
 
   // Android Phase 2 opens /elder?session=…#text=<shared message>, so the same
-  // extractUrl + "Will check" preview runs here instead of being rewritten in
+  // extractLink + "Will check" preview runs here instead of being rewritten in
   // Kotlin. The elder still taps Check; nothing is sent automatically. It's a
   // #fragment, not ?query, so the SMS never reaches the web host's logs.
   const [link, setLink] = useState(() => sharedText() ?? '');
@@ -127,7 +114,7 @@ export function Scan({ session }: { session: string }) {
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
-  const linkUrl = extractUrl(link);
+  const found = extractLink(link);
 
   const sending = status.kind === 'uploading' || status.kind === 'waiting';
   // Until history has loaded we can't tell a new verdict from an old one.
@@ -136,8 +123,10 @@ export function Scan({ session }: { session: string }) {
 
   return (
     <main className="screen">
-      <p className="session-tag">配对码 · Code: {session}</p>
-      <h1>检查应用 · Check an app</h1>
+      <p className="session-tag">
+        {t('code')}: {session}
+      </p>
+      <h1>{t('checkAnApp')}</h1>
 
       <input
         ref={fileInput}
@@ -155,20 +144,19 @@ export function Scan({ session }: { session: string }) {
         disabled={busy}
         onClick={() => fileInput.current?.click()}
       >
-        选择安装包 (APK)
-        <small>Choose an APK file</small>
+        {t('chooseApk')}
       </button>
 
       <form
         className="link-form"
         onSubmit={e => {
           e.preventDefault();
-          if (linkUrl && !busy) checkLink(linkUrl);
+          if (found && !busy) checkLink(found, link);
         }}
       >
-        <label htmlFor="link">或粘贴链接 · Or paste a link</label>
+        <label htmlFor="link">{t('orPasteLink')}</label>
         <p className="hint link-hint" id="link-hint">
-          可以粘贴整条短信 · Pasting the whole message is OK
+          {t('wholeMessageOk')}
         </p>
         {/* textarea, not input: an <input> strips line breaks from pasted
             messages, gluing "https://evil.top." onto the next line's words. */}
@@ -184,34 +172,45 @@ export function Scan({ session }: { session: string }) {
           autoCapitalize="off"
           spellCheck={false}
         />
-        {linkUrl && link.trim() !== linkUrl && (
-          <p className="hint link-preview">将检查 · Will check: {linkUrl}</p>
+        {found && link.trim() !== found.url && (
+          <p className="hint link-preview">
+            {t('willCheck')} {found.url}
+            {/* Host as written differs from the real host (non-Latin letters, user@host):
+                show both so the trick is visible. Risk is the service's call. */}
+            {found.hostDiffers && (
+              <>
+                <br />
+                {t('writtenAs')} {found.written}
+              </>
+            )}
+          </p>
         )}
-        <button className="btn btn--secondary" type="submit" disabled={!linkUrl || busy}>
-          检查链接 · Check link
+        <button className="btn btn--secondary" type="submit" disabled={!found || busy}>
+          {t('checkLink')}
         </button>
       </form>
 
       {sending && (
         <div className="loading" role="status">
           <span className="spinner" aria-hidden />
-          正在检查，请稍候… · Checking, please wait…
+          {t('checking')}
         </div>
       )}
       {status.kind === 'error' && (
         <p className="error" role="alert">
-          {status.message}
+          {t(status.key)}
+          {status.detail && ` ${status.detail}`}
         </p>
       )}
 
       <section aria-live="polite" ref={resultRef} className="result">
         {!ready ? null : latest ? (
           <>
-            <h2>{sending ? '上次检查 · Last check' : '检查结果 · Result'}</h2>
+            <h2>{sending ? t('lastCheck') : t('result')}</h2>
             <VerdictCard verdict={latest} large />
           </>
         ) : (
-          !sending && <p className="empty">还没有检查记录 · No checks yet</p>
+          !sending && <p className="empty">{t('noChecks')}</p>
         )}
       </section>
     </main>

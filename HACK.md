@@ -5,13 +5,18 @@
 
 ## Event
 - Event: Cal Hacks 13.0, Palace of Fine Arts, SF (Oct 23-25, 2026)
-- Submission deadline: TBA. Check the Dashboard or Discord. Devpost is usually due BEFORE hacking ends.
-- Judging: expo-style at our table, then finalists pitch on stage. Plan a 30s and a 2-3 min version.
-- Judging criteria: Application, Functionality/Quality, Creativity, Technical Complexity
-- Rules to respect: no code written before the event; disclose libraries, APIs, AI tools, and test data
-- Tracks we target:
-  - Anthropic "Claude for Public Benefit": <paste exact requirements>
-  - SpacetimeDB Main Track: SpacetimeDB must be core functionality, not cosmetic. <paste exact requirements>
+- Submission deadline: Devpost by **Sun 9:00 AM** (no late entries). Guide recommends a draft by Sat night.
+- Judging: Sun 10:30-12:30 at our assigned table; whole team must be present; 2-minute pitch + LIVE demo.
+- Judging criteria: impact, quality, technical complexity, creativity (guide)
+- Rules to respect: project started at the event; MLH Code of Conduct; disclose libraries, APIs, AI tools, test data
+- Tracks we target (exact criteria from the Cal Hacks 13.0 hacker guide):
+  - Anthropic: 1) a named community, 2) a real problem you lived or heard from someone, 3) it
+    works, one thing done well, 4) Claude does something that matters and we know where it could
+    go wrong for the people using it. Prize: $5,000 Claude credits + 1Y Claude Max 20x.
+  - Spacetime: SpacetimeDB as the core real-time backend (live shared state, instant sync),
+    meaningfully used, not added on the side. Prizes: $2,048 / $1,024 / $512.
+  - PROPOSED (Anthony, Sophia to OK): general "Best People-First Hack"; "Best Security Hack"
+    (Armadin, criteria TBA).
   - Both: public GitHub repo required (repo is currently PRIVATE, so make it public before submitting)
 
 ## Team
@@ -66,9 +71,9 @@ table verdict {
 reducer report_verdict(...)  // called by Sophia's pipeline
   // rejects callers whose identity isn't the analysis service's (token from POST /v1/identity).
   // Sophia OK'd locking to her identity (Slack, Sat 00:54, relayed by Anthony).
-  // Design PROPOSED by Anthony, Sophia to ack: private config table; the publisher is the DB
-  // owner and authorizes her identity via set_service_identity(hex) (no hex in the public
-  // repo); until then her calls get HTTP 530.
+  // Design (Anthony; Sophia OK'd it on Slack Sat ~11:45, relayed): private config table; the
+  // publisher is the DB owner and authorizes her identity via set_service_identity(hex) (no hex
+  // in the public repo); until then her calls get HTTP 530.
 ```
 
 ## Cut list
@@ -138,6 +143,8 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
   publish with the service authorized.
 - Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
+- Pasted SMS text is sent to the analysis service and to Claude (Anthropic) for scoring and the
+  explanation. Real messages can contain names, numbers or codes.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
@@ -225,3 +232,42 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   scam SMS), now a textarea (an <input> stripped line breaks and could glue "evil.top." onto
   "click"), and accepts #text=<shared SMS> for the Android app (prefill only, elder taps Check).
   Sophia: lowercase URLs in /analyze-url (HTTPS://… can arrive uppercase).
+- 10:45 Sat Anthony: UI now shows ONE language per device with a 中文/English toggle (remembered
+  per phone; Claude still writes both explanations, contract unchanged). Demo: set the elder
+  phone to 中文, the family phone to English, so both languages still show. Rule reasons are
+  English-only. Sophia: OK for the pitch? (MVP text says "bilingual warning" on device A.)
+- 11:15 Sat Anthony: Link extraction (src/links.ts) handles Chinese/Unicode tricks: Chinese
+  domains and TLDs (中国银行.com, 银行.中国), full-width ｈｔｔｐｓ, "。" used as a dot, and Cyrillic
+  look-alikes (аpple), user@host tricks (bank.com@evil.top → evil.top) and IP links. The URL
+  parser decides the host; `url` is sent NORMALIZED: punycode (аpple → xn--pple-43d), lowercase
+  host, user:pass@ removed, trailing / on bare hosts. The preview shows the written form when it
+  differs; the UI makes no risk call. Sophia: a mixed-script / look-alike host rule would catch
+  the аpple trick.
+- 11:45 Sat Anthony: Sophia (Slack, relayed) re-minted her token (new identity not in git
+  history, checked), removed py/.env, OK'd the owner-authorizes design, will lowercase URLs, and
+  agreed to an optional message field. Published locked demo DB scamguard-demo-158734 on Maincloud
+  and authorized her identity (anonymous + other identities get 530, checked). Endpoint now:
+  POST /analyze-url JSON {url, session_id, message?}; message = the whole pasted text (≤4000
+  chars, client-side cap only), omitted when the paste is nothing but the link. Privacy: in
+  Honesty. Sophia: please don't log the message body (request/debug logs, error traces). Old
+  open test DB scamguard-test-311c81 still exists (phone preview); delete before demo / going
+  public. NEXT: wire Scan to Sophia's live service.
+- 12:15 Sat Anthony: Event section filled from the official hacker guide (deadline Sun 9:00 AM,
+  judging 10:30-12:30, exact Anthropic + Spacetime criteria; People-First + Security PROPOSED).
+  Added docs/build-journal.md (true talking points by track + log of bugs/catches) kept by a new
+  presentation-notes agent, and the 39 link cases as scripts/test-links.sh. Anthropic gap:
+  criterion 2 needs a real conversation with someone affected. NEXT: Sophia's service live.
+- 12:45 Sat Anthony: Permanent site live: https://scam-app-check.netlify.app (Netlify, Anthony's
+  account; manual deploys from a local build). Points at the locked demo DB (empty until
+  Sophia's pipeline writes). Final build needs Sophia's HTTPS service URL. Idea for future work
+  (not now): Vietnamese/Spanish would need a verdict-contract change for Claude's explanations.
+- 13:20 Sat Anthony: Sophia's checkpoint plan (Slack 12:14, relayed): Claude/Haiku layer by 1:30
+  PM; her service on /analyze + /analyze-url writing via report_verdict by 6:00 PM (HARD); graph
+  data + precision/recall by 8 PM; pitch draft by 10 PM. SHARED 6:00 PM CHECKPOINT: full loop
+  once end to end, else stop features and fix the loop. Graph stays STRETCH (cut list). Handoff
+  for a fresh session: docs/next-session.md (README + Devpost drafts still uncommitted there).
+- 13:37 Sat Anthony: README + docs/devpost-draft.md committed (d99d137), review-approved. Claims
+  limited to what's on record (one real phone + smoke-test subscribers; service and Claude marked
+  not live). Sophia: fill Devpost Inspiration (real story + sourced stat), say whether APK samples
+  are real scam apps, confirm README step 3 / Status / Disclosures. NEXT: Sophia's HTTPS service
+  URL → real two-phone loop by 6 PM.

@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useSpacetimeDB } from 'spacetimedb/react';
 import { navigate, useLocation } from './router';
-import { CANT_CONNECT, useSlowToLoad } from './useSlowToLoad';
+import { useSlowToLoad } from './useSlowToLoad';
+import { LangToggle, useLang } from './i18n';
 import { clearPairing, isValidCode, loadPairing, normalizeCode } from './session';
 import { Pairing } from './screens/Pairing';
 import { Scan } from './screens/Scan';
@@ -12,6 +13,7 @@ function App() {
   // One offline signal for every screen, including drops mid-session.
   const slow = useSlowToLoad(connected);
   const { path, params } = useLocation();
+  const { t } = useLang();
   const session = normalizeCode(params.get('session') ?? '');
 
   // Returning visitor on "/": go straight back to their screen.
@@ -40,9 +42,12 @@ function App() {
     <>
       {!connected && (
         <div className={slow ? 'offline offline--down' : 'offline'} role="status">
-          {slow ? CANT_CONNECT : '正在连接… · Connecting to server…'}
+          {slow ? t('cantConnect') : t('connecting')}
         </div>
       )}
+      <div className="topbar">
+        <LangToggle />
+      </div>
       {screen}
       {paired && (
         <button
@@ -52,7 +57,7 @@ function App() {
             navigate('/');
           }}
         >
-          取消配对 · Unpair
+          {t('unpair')}
         </button>
       )}
     </>

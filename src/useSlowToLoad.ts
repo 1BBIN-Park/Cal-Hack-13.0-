@@ -14,5 +14,3 @@ export function useSlowToLoad(ok: boolean, ms = 10_000): boolean {
   }, [ok, ms]);
   return slow;
 }
-
-export const CANT_CONNECT = '无法连接服务器，请检查网络。 · Can’t reach the server. Check your internet connection.';

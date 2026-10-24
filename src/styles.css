@@ -106,10 +106,6 @@ h2 {
   align-items: center;
   gap: 4px;
 }
-.btn--big small {
-  font-size: 0.8rem;
-  opacity: 0.85;
-}
 .btn--link {
   background: none;
   color: var(--primary);
@@ -161,12 +157,6 @@ form {
   font-size: 1.8rem;
   line-height: 1.2;
   margin: 8px 0 0;
-}
-.hero__title span {
-  display: block;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--muted);
 }
 .empty-state {
   background: var(--surface);
@@ -320,11 +310,11 @@ form {
   height: 32px;
   font-size: 1rem;
 }
-.verdict--large .verdict__text[lang='zh'] {
+.verdict--large .verdict__text:lang(zh) {
   font-size: 1.3rem;
   font-weight: 600;
 }
-.verdict--large .verdict__text[lang='en'] {
+.verdict--large .verdict__text:lang(en) {
   font-size: 1.05rem;
 }
 
@@ -370,4 +360,29 @@ form {
   display: block;
   margin: 0 auto 24px;
   font-size: 0.85rem;
+}
+
+/* Language toggle: top-right on every screen, large enough to tap. */
+.topbar {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 12px 16px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.lang-toggle {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.lang-toggle:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }

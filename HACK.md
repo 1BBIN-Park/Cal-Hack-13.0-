@@ -229,3 +229,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   per phone; Claude still writes both explanations, contract unchanged). Demo: set the elder
   phone to 中文, the family phone to English, so both languages still show. Rule reasons are
   English-only. Sophia: OK for the pitch? (MVP text says "bilingual warning" on device A.)
+- 11:15 Sat Anthony: Link extraction (src/links.ts) handles Chinese/Unicode tricks: Chinese
+  domains and TLDs (中国银行.com, 银行.中国), full-width ｈｔｔｐｓ, "。" used as a dot, and Cyrillic
+  look-alikes (аpple), user@host tricks (bank.com@evil.top → evil.top) and IP links. The URL
+  parser decides the host; `url` is sent NORMALIZED: punycode (аpple → xn--pple-43d), lowercase
+  host, user:pass@ removed, trailing / on bare hosts. The preview shows the written form when it
+  differs; the UI makes no risk call. Sophia: a mixed-script / look-alike host rule would catch
+  the аpple trick.

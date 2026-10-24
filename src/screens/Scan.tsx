@@ -3,6 +3,7 @@ import { useTable } from 'spacetimedb/react';
 import { tables } from '../module_bindings';
 import { VerdictCard, sortNewestFirst } from '../components/VerdictCard';
 import { useLang, type StringKey } from '../i18n';
+import { extractLink } from '../links';
 
 // Sophia's analysis service. The /analyze path and form field names are
 // Anthony's assumption until Sophia's service exists (see HACK.md status log).
@@ -15,31 +16,6 @@ type Status =
   | { kind: 'error'; key: StringKey; detail?: string };
 
 const RESULT_TIMEOUT_MS = 60_000;
-
-// Elders paste whole SMS messages or bare domains, so pull out the first URL
-// and add a scheme when it's missing.
-export function extractUrl(input: string): string | null {
-  // Cap the work on huge pastes (the join regex is quadratic on junk input).
-  const text = input.slice(0, 4000);
-  // Text copied out of a screenshot (iPhone Live Text) keeps the visual line
-  // breaks, splitting links like "https://fideitly-\nintenrational.top/\n...".
-  // Rejoin only when the next line itself looks like URL text (lowercase start
-  // and a connector, or nothing else on the line), so "https://evil.top.\nclick
-  // to confirm" stays evil.top and a following sentence isn't glued on.
-  let joined = text;
-  for (let prev = ''; prev !== joined; ) {
-    prev = joined;
-    joined = joined.replace(
-      /([Hh][Tt][Tt][Pp][Ss]?:\/\/\S*[-/.?=&])[ \t]*\r?\n[ \t]*(?=[a-z0-9]\S*(?:[-/.?=&]|[ \t]*(?:\r?\n|$)))/,
-      '$1'
-    );
-  }
-  // ASCII URL characters only: Chinese SMS text has no spaces to end the URL.
-  const withScheme = joined.match(/https?:\/\/[A-Za-z0-9\-._~:/?#[\]@!$&*+;=%]+/i);
-  if (withScheme) return withScheme[0].replace(/[.,;:!?)\]]+$/, '');
-  const bare = text.match(/\b[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}\b(\/[^\s<>"']*)?/i);
-  return bare ? `https://${bare[0]}` : null;
-}
 
 function sharedText(): string | null {
   return new URLSearchParams(window.location.hash.slice(1)).get('text');
@@ -109,7 +85,7 @@ export function Scan({ session }: { session: string }) {
   }
 
   // Android Phase 2 opens /elder?session=…#text=<shared message>, so the same
-  // extractUrl + "Will check" preview runs here instead of being rewritten in
+  // extractLink + "Will check" preview runs here instead of being rewritten in
   // Kotlin. The elder still taps Check; nothing is sent automatically. It's a
   // #fragment, not ?query, so the SMS never reaches the web host's logs.
   const [link, setLink] = useState(() => sharedText() ?? '');
@@ -129,7 +105,7 @@ export function Scan({ session }: { session: string }) {
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
-  const linkUrl = extractUrl(link);
+  const found = extractLink(link);
 
   const sending = status.kind === 'uploading' || status.kind === 'waiting';
   // Until history has loaded we can't tell a new verdict from an old one.
@@ -166,7 +142,7 @@ export function Scan({ session }: { session: string }) {
         className="link-form"
         onSubmit={e => {
           e.preventDefault();
-          if (linkUrl && !busy) checkLink(linkUrl);
+          if (found && !busy) checkLink(found.url);
         }}
       >
         <label htmlFor="link">{t('orPasteLink')}</label>
@@ -187,12 +163,20 @@ export function Scan({ session }: { session: string }) {
           autoCapitalize="off"
           spellCheck={false}
         />
-        {linkUrl && link.trim() !== linkUrl && (
+        {found && link.trim() !== found.url && (
           <p className="hint link-preview">
-            {t('willCheck')} {linkUrl}
+            {t('willCheck')} {found.url}
+            {/* Host as written differs from the real host (non-Latin letters, user@host):
+                show both so the trick is visible. Risk is the service's call. */}
+            {found.hostDiffers && (
+              <>
+                <br />
+                {t('writtenAs')} {found.written}
+              </>
+            )}
           </p>
         )}
-        <button className="btn btn--secondary" type="submit" disabled={!linkUrl || busy}>
+        <button className="btn btn--secondary" type="submit" disabled={!found || busy}>
           {t('checkLink')}
         </button>
       </form>

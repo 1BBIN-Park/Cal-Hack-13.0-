@@ -36,6 +36,7 @@ const STRINGS = {
   orPasteLink: { zh: '或粘贴链接', en: 'Or paste a link' },
   wholeMessageOk: { zh: '可以粘贴整条短信', en: 'Pasting the whole message is OK' },
   willCheck: { zh: '将检查：', en: 'Will check:' },
+  writtenAs: { zh: '原文写作：', en: 'Written in the message as:' },
   checkLink: { zh: '检查链接', en: 'Check link' },
   checking: { zh: '正在检查，请稍候…', en: 'Checking, please wait…' },
   result: { zh: '检查结果', en: 'Result' },

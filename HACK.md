@@ -5,13 +5,18 @@
 
 ## Event
 - Event: Cal Hacks 13.0, Palace of Fine Arts, SF (Oct 23-25, 2026)
-- Submission deadline: TBA. Check the Dashboard or Discord. Devpost is usually due BEFORE hacking ends.
-- Judging: expo-style at our table, then finalists pitch on stage. Plan a 30s and a 2-3 min version.
-- Judging criteria: Application, Functionality/Quality, Creativity, Technical Complexity
-- Rules to respect: no code written before the event; disclose libraries, APIs, AI tools, and test data
-- Tracks we target:
-  - Anthropic "Claude for Public Benefit": <paste exact requirements>
-  - SpacetimeDB Main Track: SpacetimeDB must be core functionality, not cosmetic. <paste exact requirements>
+- Submission deadline: Devpost by **Sun 9:00 AM** (no late entries). Guide recommends a draft by Sat night.
+- Judging: Sun 10:30-12:30 at our assigned table; whole team must be present; 2-minute pitch + LIVE demo.
+- Judging criteria: impact, quality, technical complexity, creativity (guide)
+- Rules to respect: project started at the event; MLH Code of Conduct; disclose libraries, APIs, AI tools, test data
+- Tracks we target (exact criteria from the Cal Hacks 13.0 hacker guide):
+  - Anthropic: 1) a named community, 2) a real problem you lived or heard from someone, 3) it
+    works, one thing done well, 4) Claude does something that matters and we know where it could
+    go wrong for the people using it. Prize: $5,000 Claude credits + 1Y Claude Max 20x.
+  - Spacetime: SpacetimeDB as the core real-time backend (live shared state, instant sync),
+    meaningfully used, not added on the side. Prizes: $2,048 / $1,024 / $512.
+  - PROPOSED (Anthony, Sophia to OK): general "Best People-First Hack"; "Best Security Hack"
+    (Armadin, criteria TBA).
   - Both: public GitHub repo required (repo is currently PRIVATE, so make it public before submitting)
 
 ## Team
@@ -244,5 +249,11 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   and authorized her identity (anonymous + other identities get 530, checked). Endpoint now:
   POST /analyze-url JSON {url, session_id, message?}; message = the whole pasted text (≤4000
   chars, client-side cap only), omitted when the paste is nothing but the link. Privacy: in
-  Honesty. Sophia: please don't log the message body (request/debug logs, error traces). Old open test DB scamguard-test-311c81 still exists
-  (phone preview); delete before demo / going public. NEXT: wire Scan to Sophia's live service.
+  Honesty. Sophia: please don't log the message body (request/debug logs, error traces). Old
+  open test DB scamguard-test-311c81 still exists (phone preview); delete before demo / going
+  public. NEXT: wire Scan to Sophia's live service.
+- 12:15 Sat Anthony: Event section filled from the official hacker guide (deadline Sun 9:00 AM,
+  judging 10:30-12:30, exact Anthropic + Spacetime criteria; People-First + Security PROPOSED).
+  Added docs/build-journal.md (true talking points by track + log of bugs/catches) kept by a new
+  presentation-notes agent, and the 39 link cases as scripts/test-links.sh. Anthropic gap:
+  criterion 2 needs a real conversation with someone affected. NEXT: Sophia's service live.

@@ -192,3 +192,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   Node subscribers (web app not yet tested on Maincloud). Each POST /v1/identity mints a new
   identity, so Sophia: mint the service token on Maincloud and we hardcode that hex.
   NEXT: host the web app (Vercel, env vars set) and open it on a phone.
+- 00:09 Sat Anthony: Hosting check PASSED (temporary Netlify Drop host, not in repo) on a real
+  phone -> Maincloud test DB (its name is now in a public bundle; still delete before demo). A
+  curl-sent verdict appeared on the phone's Family screen (no-refresh not yet confirmed).
+  Vercel auto-deploy from GitHub needs the repo owner (1BBIN-Park) to install the Vercel app
+  (Anthony has push, not admin); workaround: deploy from Anthony's own Vercel account by CLI or
+  drag-and-drop. NEXT: Sophia's /analyze -> report_verdict; identity check; long-lived host;
+  then Android Phase 2.

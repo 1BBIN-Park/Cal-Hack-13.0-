@@ -257,3 +257,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   Added docs/build-journal.md (true talking points by track + log of bugs/catches) kept by a new
   presentation-notes agent, and the 39 link cases as scripts/test-links.sh. Anthropic gap:
   criterion 2 needs a real conversation with someone affected. NEXT: Sophia's service live.
+- 12:45 Sat Anthony: Permanent site live: https://scam-app-check.netlify.app (Netlify, Anthony's
+  account; manual deploys from a local build). Points at the locked demo DB (empty until
+  Sophia's pipeline writes). Final build needs Sophia's HTTPS service URL. Idea for future work
+  (not now): Vietnamese/Spanish would need a verdict-contract change for Claude's explanations.

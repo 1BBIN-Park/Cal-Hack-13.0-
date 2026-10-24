@@ -37,6 +37,15 @@ or a recorded test shows; anything not live yet is marked.
   redeploying). Smoke-tested, and live on the Maincloud demo DB.
 - Auto-reconnect: tested by killing the local server mid-session; the banner showed, cleared, and
   live alerts resumed without a reload.
+- Framing for judges (true, not "impossible without it"): SpacetimeDB gave us the database, the
+  read/fan-out and push layer (no backend of ours for sync), reconnection (the SDK's, no code of
+  ours), and an authenticated caller identity, so write-path auth is a ~10-line check inside the
+  reducer instead of an auth service. Reads are public by design (Honesty list). The analysis
+  service (Sophia's) is a separate server that writes the verdict.
+- Demo line (not live yet: needs Sophia's hosted service): paste the scam SMS on the elder phone;
+  after the analysis, the family phone in the judge's hand updates at the same moment the elder's
+  does. "Both phones read it from the same SpacetimeDB subscription. No server of ours relays it."
+- Permanent demo site: https://scam-app-check.netlify.app (locked demo DB on Maincloud).
 
 **Technical complexity / quality / security**
 - Link extraction handles real phishing tricks: Cyrillic look-alikes, `bank.com@evil.top`,

@@ -1,0 +1,45 @@
+[
+  {
+    "session_id": "DEMO_SESSION_ID",
+    "app_name": "org.billthefarmer.notes",
+    "risk_level": "low",
+    "reasons": [
+      "Contains hardcoded URL(s) the app connects to: https://www.openstreetmap.org/#map=16/%f/%f, https://www.openstreetmap.org/export/embed.html?bbox=%f,%f,%f,%f&amp;layer=mapnik"
+    ],
+    "timestamp": "2026-10-24T20:25:10.672467+00:00",
+    "explanation_en": "This app contains web addresses that are built into it. The app connects to OpenStreetMap, a public mapping service, to show you maps and location information. This is normal behavior for a map-based app and does not pose a security risk.",
+    "explanation_zh": "这个应用程序内部包含了一些网址。应用程序连接到OpenStreetMap这个公开的地图服务来为您显示地图和位置信息。这是地图类应用程序的正常行为，不会带来安全风险。",
+    "explanation_es": "Esta aplicación contiene direcciones web incorporadas. La aplicación se conecta a OpenStreetMap, un servicio de mapas público, para mostrarle mapas e información de ubicación. Este es un comportamiento normal para una aplicación basada en mapas y no presenta ningún riesgo de seguridad.",
+    "explanation_vi": "Ứng dụng này chứa các địa chỉ web được tích hợp sẵn. Ứng dụng kết nối với OpenStreetMap, một dịch vụ bản đồ công khai, để hiển thị bản đồ và thông tin vị trí cho bạn. Đây là hành vi bình thường của một ứng dụng dựa trên bản đồ và không có rủi ro bảo mật."
+  },
+  {
+    "session_id": "DEMO_SESSION_ID",
+    "app_name": "com.github.characterdog.bmicalculator",
+    "risk_level": "medium",
+    "reasons": [
+      "App is essentially just a wrapper around a webpage (WebView shell) with very little of its own native functionality",
+      "Contains hardcoded URL(s) the app connects to: http://play.google.com/store/apps/details?id=, https://crowdin.com/project/characterdog-bmi-calculator, https://github.com/characterdog (+2 more)"
+    ],
+    "timestamp": "2026-10-24T20:25:15.932938+00:00",
+    "explanation_en": "This app is basically just a window that shows a website inside it, rather than being a full standalone app. It connects to several fixed websites (like Google Play, GitHub, and Crowdin) that the developer built into the app. While this isn't necessarily dangerous, it means you're mostly browsing the web through this app rather than using custom app features.",
+    "explanation_zh": "这个应用本质上只是在应用内显示网页的一个窗口，而不是一个完整的独立应用。它连接到开发者内置的几个固定网站（如Google Play、GitHub和Crowdin）。虽然这不一定危险，但这意味着您主要是通过这个应用浏览网络，而不是使用自定义应用功能。",
+    "explanation_es": "Esta aplicación es básicamente una ventana que muestra un sitio web dentro de ella, en lugar de ser una aplicación completa e independiente. Se conecta a varios sitios web fijos (como Google Play, GitHub y Crowdin) que el desarrollador incorporó en la aplicación. Aunque esto no es necesariamente peligroso, significa que principalmente estás navegando por la web a través de esta aplicación en lugar de usar funciones personalizadas.",
+    "explanation_vi": "Ứng dụng này về cơ bản chỉ là một cửa sổ hiển thị một trang web bên trong nó, thay vì là một ứng dụng độc lập đầy đủ. Nó kết nối với một số trang web cố định (như Google Play, GitHub và Crowdin) mà nhà phát triển tích hợp vào ứng dụng. Mặc dù điều này không nhất thiết nguy hiểm, nhưng nó có nghĩa là bạn chủ yếu đang duyệt web thông qua ứng dụng này thay vì sử dụng các tính năng tùy chỉnh."
+  },
+  {
+    "session_id": "DEMO_SESSION_ID",
+    "app_name": "com.example.fakescamsample",
+    "risk_level": "high",
+    "reasons": [
+      "Requests permissions commonly abused in scam apps: android.permission.READ_SMS, android.permission.RECEIVE_SMS, android.permission.REQUEST_INSTALL_PACKAGES",
+      "App is essentially just a wrapper around a webpage (WebView shell) with very little of its own native functionality",
+      "Contains hardcoded string(s) that look like cryptocurrency wallet addresses: 0x1234567890abcdef1234567890abcdef12345678, 1lRBgqQoAlpqE9QA0P6jZxba0BA, 3ixFdUCfZbLFklUSG46db99CeD8",
+      "Contains hardcoded URL(s) the app connects to: https://totally-legit-crypto-investing.test/login"
+    ],
+    "timestamp": "2026-10-24T20:25:20.857653+00:00",
+    "explanation_en": "This app has several warning signs that suggest it may be a scam. It can read and intercept your text messages, which is commonly used to steal money or personal information. The app also contains hidden cryptocurrency wallet addresses and connects to suspicious websites. We recommend not installing this app.",
+    "explanation_zh": "这个应用程序有几个警告信号，表明它可能是诈骗。它可以读取和拦截您的短信，这通常用于盗取金钱或个人信息。该应用程序还包含隐藏的加密货币钱包地址并连接到可疑网站。我们建议不要安装此应用程序。",
+    "explanation_es": "Esta aplicación tiene varias señales de alerta que sugieren que podría ser una estafa. Puede leer e interceptar sus mensajes de texto, lo que comúnmente se usa para robar dinero o información personal. La aplicación también contiene direcciones de billetera de criptomonedas ocultas y se conecta a sitios web sospechosos. Le recomendamos que no instale esta aplicación.",
+    "explanation_vi": "Ứng dụng này có một số dấu hiệu cảnh báo cho thấy nó có thể là một trò lừa đảo. Nó có thể đọc và chặn các tin nhắn văn bản của bạn, điều này thường được sử dụng để đánh cắp tiền hoặc thông tin cá nhân. Ứng dụng cũng chứa các địa chỉ ví tiền điện tử ẩn và kết nối với các trang web đáng ngờ. Chúng tôi khuyên bạn không nên cài đặt ứng dụng này."
+  }
+]

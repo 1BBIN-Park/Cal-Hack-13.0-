@@ -1,5 +1,5 @@
 """
-Static analysis script for Cal Hacks 13.0 scam-app detector.
+Static analysis script for Cal Hacks scam-app detector.
 Extracts: permissions, signing cert hash, hardcoded URLs/wallet-like strings,
 and whether the app looks like a pure WebView shell.
 
@@ -24,7 +24,20 @@ URL_PATTERN = re.compile(r'https?://[^\s"\'<>]+')
 # Very loose heuristics for wallet-looking strings — good enough for a hackathon demo,
 # NOT a production-grade wallet validator.
 ETH_WALLET_PATTERN = re.compile(r'\b0x[a-fA-F0-9]{40}\b')
-BTC_WALLET_PATTERN = re.compile(r'\b(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}\b')
+BTC_WALLET_PATTERN = re.compile(r'\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}\b')
+
+# URLs containing any of these are framework/tooling noise (XML namespaces, IDE
+# tooling links, library feedback forms) — not meaningful app behavior.
+FRAMEWORK_URL_SUBSTRINGS = [
+    "schemas.android.com",
+    "schemas.google.com",
+    "www.w3.org",
+    "goo.gle",
+    "r.android.com",
+    "youtrack.jetbrains.com",
+    "developer.android.com",
+    "kotlinlang.org",
+]
 
 # Permissions that are common red flags for this kind of scam app.
 SUSPICIOUS_PERMISSIONS = {
@@ -71,36 +84,60 @@ def extract_strings_from_dex(dex_list):
     return all_strings
 
 
-def is_webview_shell(apk_obj, dex_list):
+# Prefixes for framework/library code — these show up in every modern Android app
+# (AndroidX, Compose, Kotlin stdlib, Google libs) and should not count as "the app's
+# own logic" when we're deciding whether an app is "basically nothing but a WebView".
+FRAMEWORK_CLASS_PREFIXES = [
+    "Landroid/",
+    "Landroidx/",
+    "Lkotlin/",
+    "Lkotlinx/",
+    "Lcom/google/",
+    "Lcom/android/",
+    "Lorg/jetbrains/",
+]
+
+
+def is_webview_shell(apk_obj, dex_list, all_strings):
     """
-    Heuristic: app looks like a pure WebView wrapper if WebView-related classes/calls
-    dominate and there are very few custom native classes doing real logic.
-    This is a heuristic for a hackathon demo, not a rigorous classifier.
+    Heuristic: app looks like a pure WebView wrapper if (a) the app's own code
+    (excluding framework/library classes) is very small, and (b) WebView is
+    referenced somewhere in the app. This is a heuristic for a hackathon demo,
+    not a rigorous classifier — tune the thresholds against your real samples.
     """
-    webview_indicators = 0
-    total_classes = 0
+    non_framework_class_count = 0
 
     for dex in dex_list:
         try:
             for cls in dex.get_classes():
-                total_classes += 1
                 class_name = cls.get_name()
-                # Skip common framework/support library classes when counting "real" classes
-                if any(
-                    skip in class_name
-                    for skip in ["Landroid/", "Lkotlin/", "Landroidx/", "Lcom/google/"]
-                ):
+                # Auto-generated classes (resource IDs, BuildConfig, compiler-synthesized
+                # inner/lambda classes with "$" in the name) aren't "the app's own logic"
+                # either, even though they live under the app's own package.
+                if "BuildConfig" in class_name:
                     continue
-                methods = cls.get_methods()
-                for m in methods:
-                    if "WebView" in str(m.get_descriptor()) or "loadUrl" in m.get_name():
-                        webview_indicators += 1
-    if total_classes == 0:
-        return False, 0, 0
-    ratio = webview_indicators / max(total_classes, 1)
-    # heuristic threshold — tune based on your actual samples
-    looks_like_shell = ratio > 0.05 and total_classes < 50
-    return looks_like_shell, webview_indicators, total_classes
+                if "/R$" in class_name or class_name.endswith("/R;"):
+                    continue
+                if "$" in class_name:
+                    continue
+                if any(class_name.startswith(prefix) for prefix in FRAMEWORK_CLASS_PREFIXES):
+                    continue
+                non_framework_class_count += 1
+        except Exception:
+            continue
+
+    # WebView usage shows up as a type reference in the dex string pool
+    # (e.g. "Landroid/webkit/WebView;") even when WebView is just a local
+    # variable, which a method-signature check would miss.
+    blob = "\n".join(all_strings)
+    references_webview = "Landroid/webkit/WebView" in blob or "android.webkit.WebView" in blob
+
+    # Heuristic threshold — a "real" app usually has dozens+ of its own classes
+    # (activities, fragments, adapters, view models...). A pure WebView shell
+    # typically has only a handful (just the launcher Activity, maybe a couple
+    # of theme/util classes).
+    looks_like_shell = references_webview and non_framework_class_count <= 30
+    return looks_like_shell, references_webview, non_framework_class_count
 
 
 def analyze_single_apk(apk_path):
@@ -142,11 +179,16 @@ def analyze_single_apk(apk_path):
     except Exception as e:
         result["errors"].append(f"Cert extraction failed: {e}")
 
-    # Strings -> URLs + wallet-like patterns
+    # Strings -> URLs + wallet-like patterns (also used by the WebView check below)
+    all_strings = []
     try:
         all_strings = extract_strings_from_dex(dex_list)
         blob = "\n".join(all_strings)
-        result["hardcoded_urls"] = sorted(set(URL_PATTERN.findall(blob)))
+        found_urls = set(URL_PATTERN.findall(blob))
+        # Drop known framework/tooling URLs (XML namespace schemas, Compose/Kotlin
+        # tooling links, etc.) that show up in every app and aren't a useful signal.
+        found_urls = {u for u in found_urls if not any(fw in u for fw in FRAMEWORK_URL_SUBSTRINGS)}
+        result["hardcoded_urls"] = sorted(found_urls)
         wallets = set(ETH_WALLET_PATTERN.findall(blob)) | set(BTC_WALLET_PATTERN.findall(blob))
         result["hardcoded_wallet_like_strings"] = sorted(wallets)
     except Exception as e:
@@ -154,11 +196,13 @@ def analyze_single_apk(apk_path):
 
     # WebView shell heuristic
     try:
-        is_shell, webview_hits, total_classes = is_webview_shell(apk_obj, dex_list)
+        is_shell, references_webview, non_fw_class_count = is_webview_shell(
+            apk_obj, dex_list, all_strings
+        )
         result["is_webview_shell"] = is_shell
         result["webview_shell_debug"] = {
-            "webview_indicator_count": webview_hits,
-            "non_framework_class_count": total_classes,
+            "references_webview": references_webview,
+            "non_framework_class_count": non_fw_class_count,
         }
     except Exception as e:
         result["errors"].append(f"WebView shell check failed: {e}")

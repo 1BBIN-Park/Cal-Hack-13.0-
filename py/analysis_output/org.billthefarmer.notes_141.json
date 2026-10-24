@@ -1,0 +1,25 @@
+{
+  "file": "org.billthefarmer.notes_141.apk",
+  "sha256": "ae8aa96794fc55d58916d8fe3a217912fbcc9edd5ec9fb72c547f90d97d3c0ea",
+  "package_name": "org.billthefarmer.notes",
+  "permissions": [
+    "com.android.launcher.permission.INSTALL_SHORTCUT",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.WRITE_EXTERNAL_STORAGE",
+    "android.permission.INTERNET",
+    "android.permission.MANAGE_EXTERNAL_STORAGE"
+  ],
+  "suspicious_permissions": [],
+  "cert_sha256": "fa6bc45a1eacef7b5ef64b0bc878ee776f403ac7efa654e853c0fb3069038641",
+  "hardcoded_urls": [
+    "https://www.openstreetmap.org/#map=16/%f/%f",
+    "https://www.openstreetmap.org/export/embed.html?bbox=%f,%f,%f,%f&amp;layer=mapnik"
+  ],
+  "hardcoded_wallet_like_strings": [],
+  "is_webview_shell": false,
+  "webview_shell_debug": {
+    "references_webview": true,
+    "non_framework_class_count": 236
+  },
+  "errors": []
+}

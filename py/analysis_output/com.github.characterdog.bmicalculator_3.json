@@ -1,0 +1,22 @@
+{
+  "file": "com.github.characterdog.bmicalculator_3.apk",
+  "sha256": "f030788fe2a88cd89cc0658b85d4c52c3fadccf83ea0425a57dce9b212fda400",
+  "package_name": "com.github.characterdog.bmicalculator",
+  "permissions": [],
+  "suspicious_permissions": [],
+  "cert_sha256": "e13fb8254bdf7a36ecb5a5052276631606ee05d5ef3f8b8b84204a0d59939033",
+  "hardcoded_urls": [
+    "http://play.google.com/store/apps/details?id=",
+    "https://crowdin.com/project/characterdog-bmi-calculator",
+    "https://github.com/characterdog",
+    "https://github.com/characterdog/bmi-calculator/blob/master/LICENSE",
+    "https://play.google.com/store/apps/details?id="
+  ],
+  "hardcoded_wallet_like_strings": [],
+  "is_webview_shell": true,
+  "webview_shell_debug": {
+    "references_webview": true,
+    "non_framework_class_count": 17
+  },
+  "errors": []
+}

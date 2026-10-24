@@ -11,3 +11,7 @@ __pycache__/
 *.aab
 *.dex
 .DS_Store
+
+# SpacetimeDB
+spacetime.local.json
+*.tsbuildinfo

@@ -147,3 +147,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
      and says to test hosting tonight, so both go first.
   NEXT: scaffold `spacetimedb/` (CLI installing) with verdict table as DRAFT, report_verdict spike
   + hosting check, then 3 static screens.
+- 21:45 Fri Anthony: Scaffolded react-ts client + TS module (CLI 2.13). verdict table +
+  report_verdict are DRAFT with NO identity check yet, so default publish target is local; any
+  Maincloud DB before the check is a throwaway. Reviewer: comparing `ctx.sender.toHexString()` to a
+  hardcoded hex works for the check. Sophia: OK? NEXT: report_verdict spike + hosting, then screens.

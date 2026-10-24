@@ -109,7 +109,7 @@ Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm
 - Riskiest integration: Sophia's pipeline calling `report_verdict`. No Python SDK exists, so either
   HTTP API `POST /v1/database/<db>/call/report_verdict` (JSON array of args, Bearer token) or a
   small Node script using the TS SDK. Spike result: HTTP API works locally (see
-  docs/report-verdict-spike.md); Maincloud still to test.
+  docs/report-verdict-spike.md); also works on Maincloud (Fri 23:31).
 - Analysis service: set an upload size limit (APKs can be tens of MB).
 
 Architecture:
@@ -127,6 +127,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 - Test APKs may be self-built "scam-pattern" samples, not real malware. Say which.
 - Small sample set, so precision/recall numbers are indicative only
 - Claude may mistranslate urgency or soften a warning (known failure mode)
+- Until the identity check lands, report_verdict accepts any caller, even with no token (tested).
+  Must be fixed before the demo DB on Maincloud: the DB name ships in the web bundle, so anyone
+  at the expo could insert fake verdicts. (Proposed by Anthony; Sophia to agree.)
+- Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
@@ -179,3 +183,12 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   must answer CORS preflight (OPTIONS). 23:24: Sophia confirmed the WeChat -> SMS/WhatsApp change
   to the Problem section (relayed by Anthony). Sophia: still ack the other relayed decisions above.
   NEXT: hosting check, Android share target.
+- 23:25 Fri Anthony (hack-check): phase BUILD (deadline TBA, assumed Sun AM). Weakest: Functionality (no
+  analysis service, Claude not called yet). NEXT: Sophia's minimal /analyze -> rules -> Claude ->
+  report_verdict on one sample APK; Anthony: Maincloud + Vercel hosting check. Paste exact track
+  requirements and the real deadline.
+- 23:31 Fri Anthony: Maincloud works: throwaway DB scamguard-test-311c81 (open writes; delete
+  before the demo and before the repo goes public). HTTPS report_verdict 200, live WSS sync to 2
+  Node subscribers (web app not yet tested on Maincloud). Each POST /v1/identity mints a new
+  identity, so Sophia: mint the service token on Maincloud and we hardcode that hex.
+  NEXT: host the web app (Vercel, env vars set) and open it on a phone.

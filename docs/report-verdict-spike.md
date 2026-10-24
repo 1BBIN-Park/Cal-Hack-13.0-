@@ -26,7 +26,19 @@ the contract was agreed (Fri 22:45, `created_at` renamed to `timestamp`).
    ```
    Python (UNTESTED, hand-written equivalent of the curl above):
    `requests.post(url, json=[...], headers={"Authorization": f"Bearer {token}"})`.
-   For Maincloud, swap the host for the Maincloud URL (to be confirmed in the hosting check).
+   For Maincloud, use host `https://maincloud.spacetimedb.com` (verified Fri 23:31).
+
+## Maincloud (Fri 23:31)
+Throwaway Maincloud DB `scamguard-test-311c81` (open writes; delete before the demo and before the
+repo goes public). What ran: publish; `POST /v1/identity` on Maincloud for a token; HTTPS call to
+`https://maincloud.spacetimedb.com/v1/database/<db>/call/report_verdict` returned 200 in 0.33s; two
+Node TS SDK subscribers on `wss://maincloud.spacetimedb.com` filtered on `session_id = 'TEST23'`
+both logged the insert at the same client receive time (06:31:07.080Z, each process's own clock).
+Not re-run on Maincloud: the SQL row check and the other-session filter check (done locally).
+
+Identity: each `POST /v1/identity` call mints a NEW identity, on any server. So mint the service
+token on Maincloud, keep it in `.env`, and hardcode that token's hex in the identity check.
+(Whether a local-server token works on Maincloud wasn't tested; don't rely on it.)
 
 ## What was checked
 - HTTP 200, and the row lands with the Chinese text and the `reasons` array intact (`spacetime sql`).

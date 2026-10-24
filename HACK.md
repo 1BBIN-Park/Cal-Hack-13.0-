@@ -31,7 +31,7 @@
   and a paired family member sees the warning live.
 
 ## MVP: the one journey
-1. Elder uploads a suspicious APK or pastes a link (web app; share sheet is cut)
+1. Elder uploads a suspicious APK (web app; share sheet and link input proposed as cuts, see below)
 2. The rules engine scores it and returns structured reasons
 3. Claude turns those reasons into a bilingual warning banner on the elder's screen
 4. The paired relative's device shows the same alert live through SpacetimeDB (view-only)
@@ -54,7 +54,9 @@ reducer report_verdict(...)  // called by Sophia's pipeline
 ```
 
 ## Cut list
-- Native Android share sheet: native Android app is too much for 2 people. Web upload instead; PWA share_target is a stretch goal.
+Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm or push back.
+- PROPOSED: Native Android share sheet. A native Android app is too much for 2 people. Web upload instead; PWA share_target is a stretch goal.
+- PROPOSED: Link input. Analyzing a link means downloading a live scam APK. Stretch goal: domain-only checks on a pasted link.
 - Login/accounts: a pairing code is the only identity
 - Remote blocking by the relative: alerts are view-only by design
 - iOS: out of scope, mention it as a limitation
@@ -84,7 +86,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 
 ## Pitch
 - One-liner: <Product> helps Chinese-American elders and their families catch sideloaded scam apps by explaining real static-analysis red flags in plain EN/中文 and alerting family instantly.
-- Roles: driver (device A) Sophia, device B Anthony, narrator <TBD>, tech answers Sophia, backup <TBD>
+- Roles: device A <TBD>, device B Anthony, narrator <TBD>, tech answers <TBD>, backup <TBD>
 
 ## Status log
-- 20:00 Fri: Scoped MVP. Cut share sheet to web upload; graph is a stretch goal. NEXT: agree on verdict contract, then spike pipeline → report_verdict → family view.
+- 20:00 Fri Anthony: Wrote plan from Sophia's doc. PROPOSED cuts: share sheet, link input; graph as stretch. NEXT: Sophia reviews the cuts + verdict contract, then spike pipeline → report_verdict → family view.

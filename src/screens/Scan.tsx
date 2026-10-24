@@ -40,6 +40,10 @@ export function extractUrl(input: string): string | null {
   return bare ? `https://${bare[0]}` : null;
 }
 
+function sharedText(): string | null {
+  return new URLSearchParams(window.location.hash.slice(1)).get('text');
+}
+
 // Screen A: the elder's device. Upload an APK; the verdict arrives through
 // SpacetimeDB (not the HTTP response), the same way the family view gets it.
 export function Scan({ session }: { session: string }) {
@@ -102,7 +106,27 @@ export function Scan({ session }: { session: string }) {
     });
   }
 
-  const [link, setLink] = useState('');
+  // Android Phase 2 opens /elder?session=…#text=<shared message>, so the same
+  // extractUrl + "Will check" preview runs here instead of being rewritten in
+  // Kotlin. The elder still taps Check; nothing is sent automatically. It's a
+  // #fragment, not ?query, so the SMS never reaches the web host's logs.
+  const [link, setLink] = useState(() => sharedText() ?? '');
+  useEffect(() => {
+    // Drop the message from the address bar so a refresh doesn't refill it
+    // and it doesn't linger in history.
+    const clear = () => window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (sharedText() !== null) clear();
+    // A second share into an already-open page only changes the fragment, which
+    // doesn't reload or remount, so pick it up here too.
+    const onHash = () => {
+      const text = sharedText();
+      if (text === null) return;
+      setLink(text);
+      clear();
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
   const linkUrl = extractUrl(link);
 
   const sending = status.kind === 'uploading' || status.kind === 'waiting';
@@ -146,16 +170,19 @@ export function Scan({ session }: { session: string }) {
         <p className="hint link-hint" id="link-hint">
           可以粘贴整条短信 · Pasting the whole message is OK
         </p>
-        <input
+        {/* textarea, not input: an <input> strips line breaks from pasted
+            messages, gluing "https://evil.top." onto the next line's words. */}
+        <textarea
           id="link"
           className="link-input"
-          type="text"
-          inputMode="url"
+          rows={3}
           aria-describedby="link-hint"
           placeholder="https://…"
           value={link}
           onChange={e => setLink(e.target.value)}
           autoComplete="off"
+          autoCapitalize="off"
+          spellCheck={false}
         />
         {linkUrl && link.trim() !== linkUrl && (
           <p className="hint link-preview">将检查 · Will check: {linkUrl}</p>

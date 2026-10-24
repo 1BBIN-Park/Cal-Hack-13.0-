@@ -191,6 +191,8 @@ form {
 }
 .link-input {
   font: inherit;
+  resize: vertical;
+  min-height: 3.5em;
   padding: 12px;
   border-radius: 12px;
   border: 2px solid var(--border);

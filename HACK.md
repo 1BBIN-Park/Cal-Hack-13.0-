@@ -89,8 +89,13 @@ Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm
      generic fallback (`application/octet-stream` or `*/*`) for file managers that send that instead.
      Confirm it's an APK by `.apk` extension or ZIP magic bytes. Also ACTION_SEND on `text/plain`
      for shared links (per Sophia's Slack, Fri 23:00).
-  3. Upload the APK + session_id (multipart) to the analysis service over HTTPS, or POST a shared
-     link to the URL-analysis endpoint (never download the APK behind it)
+  3. Upload the APK + session_id (multipart) to the analysis service over HTTPS. For shared text
+     (an SMS), don't parse it in Kotlin: open the WebView at
+     `/elder?session=<code>#text=<urlencoded shared text>` (a #fragment, so the SMS never reaches
+     the web host's logs). The page extracts the link, shows "Will check: …", and the elder taps
+     Check (built and tested Sat ~10:00). Only open it with a saved, valid pairing code. Encode
+     the text with `Uri.encode(text)` (or a raw `&`, `#`, `+` in the SMS breaks it). Repeat
+     shares into an already-open page work (hashchange).
   4. WebView opens the elder page `/elder?session=<code>`, which subscribes and shows the banner.
      Enable `setDomStorageEnabled(true)` and JavaScript on the WebView.
   No JS bridge, no Kotlin SpacetimeDB client.
@@ -216,3 +221,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   checks incl. impostor/anonymous rejection. Sophia confirmed endpoints (/analyze, /analyze-url)
   and will handle CORS (Slack, relayed). NEXT: fresh Maincloud demo DB once new hex arrives;
   wire Scan to Sophia's service.
+- 10:00 Sat Anthony: Scan link field: rejoins links split across lines (Live Text copies of real
+  scam SMS), now a textarea (an <input> stripped line breaks and could glue "evil.top." onto
+  "click"), and accepts #text=<shared SMS> for the Android app (prefill only, elder taps Check).
+  Sophia: lowercase URLs in /analyze-url (HTTPS://… can arrive uppercase).

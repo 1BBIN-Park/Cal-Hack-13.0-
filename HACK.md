@@ -21,9 +21,10 @@
 | Anthony | UX/UI, frontend | 3 screens, pairing flow, SpacetimeDB schema + reducer + client sync, graph view, demo polish |
 
 ## Problem
-- One sentence: Chinese-American elderly immigrants get pushed through WeChat messages into
-  sideloading fake crypto-trading apps, and they can't tell those apps are scams until the money is gone.
-- The user: an elderly Chinese-speaking immigrant who gets a WeChat link to an "investment app",
+- One sentence: Chinese-American elderly immigrants get pushed through text messages, WhatsApp and
+  similar apps into sideloading fake crypto-trading apps, and they can't tell those apps are scams
+  until the money is gone.
+- The user: an elderly Chinese-speaking immigrant who gets a text/WhatsApp link to an "investment app",
   plus their adult child who would step in if they knew.
 - Why it matters: money and personal info lost, sometimes escalating to physical harm; victims are
   often isolated from family during the scam. <add a number or news story>
@@ -31,7 +32,7 @@
   and a paired family member sees the warning live.
 
 ## MVP: the one journey
-1. Elder shares a suspicious APK to our Android app (Phase 2), or uploads it in the web app (Phase 1, and the permanent fallback)
+1. Elder shares a suspicious APK or link to our Android app (Phase 2), or uploads/pastes it in the web app (Phase 1, and the permanent fallback). Links get URL/redirect analysis only; APK analysis runs only on files we already have.
 2. The rules engine scores it and returns structured reasons
 3. Claude turns those reasons into a bilingual warning banner on the elder's screen
 4. The paired relative's device shows the same alert live through SpacetimeDB (view-only)
@@ -46,7 +47,8 @@ Every Claude session: if a change would contradict a row here, stop and ask the 
 | Relative's view is view-only, no remote blocking | Elder autonomy; keeps scope small | Sophia (her plan) |
 | Verdict contract below | UI and pipeline both depend on it | Sophia (relayed by Anthony) + Anthony (Fri 22:45) |
 | Android app never talks to SpacetimeDB directly; only TS (web) and the analysis service do | No official Kotlin SDK | PENDING Sophia |
-| Web upload stays working as the fallback, even after the Android app ships | Demo can't depend on the riskiest piece | PENDING Sophia |
+| Web upload stays working as the fallback, even after the Android app ships | Demo can't depend on the riskiest piece | Sophia (relayed by Anthony) + Anthony (Fri 23:12) |
+| Links get URL/redirect analysis only; never auto-download an APK from a live link | Safety/liability on stage | Sophia (relayed by Anthony) + Anthony (Fri 23:12) |
 | No APKs in git; scam samples are statically analyzed only, never installed | Safety; repo goes public | PENDING Sophia |
 
 ## Verdict contract (AGREED Fri 22:45; changes need both people)
@@ -70,22 +72,25 @@ reducer report_verdict(...)  // called by Sophia's pipeline
 ## Cut list
 Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm or push back.
 - PWA share target: dropped in favor of the native Android app (Phase 2). Both do the same job, so we picked one.
-- PROPOSED: Link input. Analyzing a link means downloading a live scam APK. Stretch goal: domain-only checks on a pasted link.
+- Auto-downloading APKs from links: never. (Link input itself is back in: URL/redirect checks only, Fri 23:12.)
 - Login/accounts: a pairing code is the only identity
 - Remote blocking by the relative: alerts are view-only by design
 - iOS: out of scope, mention it as a limitation
 - Correlation graph: STRETCH. Build it only after the two-device sync is reliable.
 
-## Phase 2: Android share-target app (Anthony's decision; Sophia to confirm. Timeboxed)
+## Phase 2: Android share-target app (Anthony's plan; Sophia confirmed on Slack Fri 23:00, relayed. Timeboxed)
 - Owner: Anthony
 - Thin Kotlin app, four jobs only:
   1. Pairing code entered once, saved in SharedPreferences
   2. Intent filters for ACTION_SEND (share sheet) and ACTION_VIEW (tapping an APK / "Open with",
      so we sit next to the package installer) on `application/vnd.android.package-archive`, plus a
      generic fallback (`application/octet-stream` or `*/*`) for file managers that send that instead.
-     Confirm it's an APK by `.apk` extension or ZIP magic bytes.
-  3. Upload the APK + session_id (multipart) to the analysis service over HTTPS
-  4. WebView opens the elder page `/elder?session=<code>`, which subscribes and shows the banner
+     Confirm it's an APK by `.apk` extension or ZIP magic bytes. Also ACTION_SEND on `text/plain`
+     for shared links (per Sophia's Slack, Fri 23:00).
+  3. Upload the APK + session_id (multipart) to the analysis service over HTTPS, or POST a shared
+     link to the URL-analysis endpoint (never download the APK behind it)
+  4. WebView opens the elder page `/elder?session=<code>`, which subscribes and shows the banner.
+     Enable `setDomStorageEnabled(true)` and JavaScript on the WebView.
   No JS bridge, no Kotlin SpacetimeDB client.
 - Networking: phones must reach THREE things over HTTPS/WSS: the React app (the WebView loads it),
   the analysis service, and SpacetimeDB. Hackathon Wi-Fi often blocks device-to-device traffic and
@@ -159,3 +164,18 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   risk_level, reasons[], explanation_en, explanation_zh, timestamp). Renamed created_at ->
   timestamp, dropped DRAFT notes. Reducer args unchanged; timestamp is set by the reducer, not
   sent. Sophia: ack here. Identity check still PENDING.
+- 23:00 Fri Anthony (logged 23:15): Sophia (Slack, relayed): no SMS reading; entry point is the Android share
+  sheet, channel-agnostic (link or APK from any app). Demo story: text-message scam. So Phase 2
+  share target is confirmed by Sophia. Asked her on Slack, no reply yet: (1) how links get
+  analyzed (decides if link input is un-cut), (2) keep web upload fallback? Anthony decided: drop
+  WeChat, story is text messages/WhatsApp/etc. (matches Sophia's demo framing).
+  NEXT: 3 web screens (Scan = file upload; link field off until Sophia answers 1).
+- 23:15 Fri Anthony: Sophia answered (Slack, relayed). (1) Links: follow redirects, analyze final
+  URL/domain (age, typosquatting, hosting), NEVER download the APK; link field goes on the Scan
+  screen. Two paths (URL, APK) feed the same verdict table. (2) Web fallback: keep it. Both added
+  to Locked decisions. Built 3 web screens (Pairing, Scan, Family). Sophia: the Scan screen calls
+  POST $VITE_ANALYSIS_URL/analyze (multipart: file, session_id) and /analyze-url (JSON: url,
+  session_id). Rename to whatever your service uses. /analyze-url sends JSON, so the service
+  must answer CORS preflight (OPTIONS). 23:24: Sophia confirmed the WeChat -> SMS/WhatsApp change
+  to the Problem section (relayed by Anthony). Sophia: still ack the other relayed decisions above.
+  NEXT: hosting check, Android share target.

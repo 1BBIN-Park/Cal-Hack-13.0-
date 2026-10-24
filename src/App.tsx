@@ -1,36 +1,54 @@
-import { tables } from './module_bindings';
-import { useSpacetimeDB, useTable } from 'spacetimedb/react';
+import { useEffect } from 'react';
+import { useSpacetimeDB } from 'spacetimedb/react';
+import { navigate, useLocation } from './router';
+import { clearPairing, isValidCode, loadPairing, normalizeCode } from './session';
+import { Pairing } from './screens/Pairing';
+import { Scan } from './screens/Scan';
+import { Family } from './screens/Family';
 
-// Placeholder until the Scan, Pairing, and Family screens land. Shows that the
-// client is connected and subscribed to the (DRAFT) verdict table.
 function App() {
   const { isActive: connected } = useSpacetimeDB();
-  const [verdicts] = useTable(tables.verdict);
+  const { path, params } = useLocation();
+  const session = normalizeCode(params.get('session') ?? '');
+
+  // Returning visitor on "/": go straight back to their screen.
+  useEffect(() => {
+    if (path !== '/') return;
+    const saved = loadPairing();
+    if (saved && (saved.role === 'elder' || saved.role === 'family') && isValidCode(saved.code)) {
+      navigate(`/${saved.role}?session=${saved.code}`);
+    }
+  }, [path]);
+
+  let screen;
+  if ((path === '/elder' || path === '/family') && isValidCode(session)) {
+    // key: a new session starts with fresh state (no stale "waiting" or NEW marks).
+    screen =
+      path === '/elder' ? <Scan key={session} session={session} /> : <Family key={session} session={session} />;
+  } else {
+    screen = <Pairing />;
+  }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Scam app check</h1>
-
-      <div style={{ marginBottom: '1rem' }}>
-        Status:{' '}
-        <strong style={{ color: connected ? 'green' : 'red' }}>
-          {connected ? 'Connected' : 'Disconnected'}
-        </strong>
-      </div>
-
-      <h2>Verdicts ({verdicts.length})</h2>
-      {verdicts.length === 0 ? (
-        <p>No alerts yet / 暂无警报</p>
-      ) : (
-        <ul>
-          {verdicts.map(v => (
-            <li key={v.id.toString()}>
-              [{v.riskLevel}] {v.appName} ({v.sessionId}): {v.explanationEn}
-            </li>
-          ))}
-        </ul>
+    <>
+      {!connected && (
+        <div className="offline" role="status">
+          正在连接… · Connecting to server…
+        </div>
       )}
-    </div>
+      {screen}
+      {path !== '/' && (
+        <button
+          className="btn btn--link unpair"
+          onClick={() => {
+            clearPairing();
+            navigate('/');
+          }}
+        >
+          取消配对 · Unpair
+        </button>
+      )}
+    </>
   );
 }
 

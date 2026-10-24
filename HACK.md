@@ -44,22 +44,22 @@ Every Claude session: if a change would contradict a row here, stop and ask the 
 |---|---|---|
 | Rules engine decides risk; Claude only writes the EN/中文 explanation | Reliable, explainable verdicts; core of the Anthropic pitch | Sophia (her plan) |
 | Relative's view is view-only, no remote blocking | Elder autonomy; keeps scope small | Sophia (her plan) |
-| Verdict contract below | UI and pipeline both depend on it | PENDING both |
+| Verdict contract below | UI and pipeline both depend on it | Sophia (relayed by Anthony) + Anthony (Fri 22:45) |
 | Android app never talks to SpacetimeDB directly; only TS (web) and the analysis service do | No official Kotlin SDK | PENDING Sophia |
 | Web upload stays working as the fallback, even after the Android app ships | Demo can't depend on the riskiest piece | PENDING Sophia |
 | No APKs in git; scam samples are statically analyzed only, never installed | Safety; repo goes public | PENDING Sophia |
 
-## Verdict contract (agree on this before building; changes need both people)
+## Verdict contract (AGREED Fri 22:45; changes need both people)
 ```
 table verdict {
   id: u64 (primary key, auto_inc)
   session_id: string        // from pairing code
   app_name: string
   risk_level: string        // "low" | "medium" | "high"
-  reasons: string[]         // from rule engine; exact format TBD with Sophia
+  reasons: string[]         // from rule engine
   explanation_en: string    // Claude
   explanation_zh: string    // Claude
-  created_at: Timestamp     // set inside the reducer from ctx.timestamp, not passed by caller
+  timestamp: Timestamp      // set inside the reducer from ctx.timestamp, not passed by caller
 }
 reducer report_verdict(...)  // called by Sophia's pipeline
   // reject callers whose identity isn't the analysis service's (token from POST /v1/identity),
@@ -103,7 +103,8 @@ Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm
 - Claude API (Haiku), server-side only, key in `.env`, never in the client
 - Riskiest integration: Sophia's pipeline calling `report_verdict`. No Python SDK exists, so either
   HTTP API `POST /v1/database/<db>/call/report_verdict` (JSON array of args, Bearer token) or a
-  small Node script using the TS SDK. Spike result: pending.
+  small Node script using the TS SDK. Spike result: HTTP API works locally (see
+  docs/report-verdict-spike.md); Maincloud still to test.
 - Analysis service: set an upload size limit (APKs can be tens of MB).
 
 Architecture:
@@ -151,3 +152,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   report_verdict are DRAFT with NO identity check yet, so default publish target is local; any
   Maincloud DB before the check is a throwaway. Reviewer: comparing `ctx.sender.toHexString()` to a
   hardcoded hex works for the check. Sophia: OK? NEXT: report_verdict spike + hosting, then screens.
+- 22:15 Fri Anthony: report_verdict spike WORKS locally over plain HTTP (no SDK needed); two live
+  subscribers got the verdict instantly, filtered by session. Sophia: copy the curl call (Python
+  equivalent untested) from docs/report-verdict-spike.md. NEXT: hosting check, then screens.
+- 22:45 Fri Anthony: Sophia agreed the verdict contract, relayed by Anthony (session_id, app_name,
+  risk_level, reasons[], explanation_en, explanation_zh, timestamp). Renamed created_at ->
+  timestamp, dropped DRAFT notes. Reducer args unchanged; timestamp is set by the reducer, not
+  sent. Sophia: ack here. Identity check still PENDING.

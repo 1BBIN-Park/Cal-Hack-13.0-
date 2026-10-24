@@ -18,5 +18,5 @@ export default __t.row({
   reasons: __t.array(__t.string()),
   explanationEn: __t.string().name("explanation_en"),
   explanationZh: __t.string().name("explanation_zh"),
-  createdAt: __t.timestamp().name("created_at"),
+  timestamp: __t.timestamp(),
 });

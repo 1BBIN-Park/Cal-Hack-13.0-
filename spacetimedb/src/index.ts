@@ -1,7 +1,6 @@
 import { schema, table, t } from 'spacetimedb/server';
 
-// DRAFT: mirrors the verdict contract in HACK.md, which is still PENDING both
-// people. Don't build on field shapes (especially `reasons`) until Sophia agrees.
+// Verdict contract agreed by Sophia + Anthony (see HACK.md). Changes need both.
 const spacetimedb = schema({
   verdict: table(
     { public: true },
@@ -10,10 +9,10 @@ const spacetimedb = schema({
       session_id: t.string().index('btree'),
       app_name: t.string(),
       risk_level: t.string(), // "low" | "medium" | "high"
-      reasons: t.array(t.string()), // from rule engine; format TBD with Sophia
+      reasons: t.array(t.string()), // from rule engine
       explanation_en: t.string(),
       explanation_zh: t.string(),
-      created_at: t.timestamp(),
+      timestamp: t.timestamp(), // set by the reducer, not the caller
     }
   ),
 });
@@ -33,6 +32,6 @@ export const report_verdict = spacetimedb.reducer(
     explanation_zh: t.string(),
   },
   (ctx, args) => {
-    ctx.db.verdict.insert({ id: 0n, ...args, created_at: ctx.timestamp });
+    ctx.db.verdict.insert({ id: 0n, ...args, timestamp: ctx.timestamp });
   }
 );

@@ -18,7 +18,7 @@ export const Verdict = __t.object("Verdict", {
   reasons: __t.array(__t.string()),
   explanationEn: __t.string(),
   explanationZh: __t.string(),
-  createdAt: __t.timestamp(),
+  timestamp: __t.timestamp(),
 });
 export type Verdict = __Infer<typeof Verdict>;
 

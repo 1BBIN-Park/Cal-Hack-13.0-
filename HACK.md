@@ -199,3 +199,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   (Anthony has push, not admin); workaround: deploy from Anthony's own Vercel account by CLI or
   drag-and-drop. NEXT: Sophia's /analyze -> report_verdict; identity check; long-lived host;
   then Android Phase 2.
+- 00:30 Sat Anthony: Added `scripts/smoke-test.sh` (local-only end-to-end check: typecheck,
+  bindings fresh, publish, HTTP report_verdict, 2 live subscribers, session filter) and a
+  `smoke-test` subagent that runs it. Passes now. Run it after touching spacetimedb/ or bindings.
+  NEXT: identity check (needs Sophia's Maincloud identity); wire Scan to Sophia's service.

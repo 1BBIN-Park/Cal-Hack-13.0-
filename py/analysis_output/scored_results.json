@@ -10,6 +10,19 @@
     ]
   },
   {
+    "app_name": "com.example.fakescamsample2",
+    "file": "app-debug2.apk",
+    "sha256": "0f84a150e6d15eeb8586048ac60cb5347f5c460f27d7a8bdb8997a817d02a81e",
+    "risk_level": "high",
+    "score": 8,
+    "reasons": [
+      "App is essentially just a wrapper around a webpage (WebView shell) with very little of its own native functionality",
+      "Contains hardcoded string(s) that look like cryptocurrency wallet addresses: 0x1234567890abcdef1234567890abcdef12345678, 1lRBgqQoAlpqE9QA0P6jZxba0BA, 3ixFdUCfZbLFklUSG46db99CeD8",
+      "Contains hardcoded URL(s) the app connects to: https://totally-legit-crypto-investing.test/login",
+      "Signed with the same certificate as other analyzed app(s): app-debug.apk \u2014 possible sign of the same operator behind multiple apps"
+    ]
+  },
+  {
     "app_name": "com.github.characterdog.bmicalculator",
     "file": "com.github.characterdog.bmicalculator_3.apk",
     "sha256": "f030788fe2a88cd89cc0658b85d4c52c3fadccf83ea0425a57dce9b212fda400",
@@ -25,12 +38,13 @@
     "file": "app-debug.apk",
     "sha256": "b9d91a22d381703bdb64cc1e778f686e3f38b15d3a5a51b8c0458cabc3f70d2c",
     "risk_level": "high",
-    "score": 7,
+    "score": 10,
     "reasons": [
-      "Requests permissions commonly abused in scam apps: android.permission.READ_SMS, android.permission.RECEIVE_SMS, android.permission.REQUEST_INSTALL_PACKAGES",
+      "Requests permissions commonly abused in scam apps: android.permission.REQUEST_INSTALL_PACKAGES, android.permission.READ_SMS, android.permission.RECEIVE_SMS",
       "App is essentially just a wrapper around a webpage (WebView shell) with very little of its own native functionality",
       "Contains hardcoded string(s) that look like cryptocurrency wallet addresses: 0x1234567890abcdef1234567890abcdef12345678, 1lRBgqQoAlpqE9QA0P6jZxba0BA, 3ixFdUCfZbLFklUSG46db99CeD8",
-      "Contains hardcoded URL(s) the app connects to: https://totally-legit-crypto-investing.test/login"
+      "Contains hardcoded URL(s) the app connects to: https://totally-legit-crypto-investing.test/login",
+      "Signed with the same certificate as other analyzed app(s): app-debug2.apk \u2014 possible sign of the same operator behind multiple apps"
     ]
   }
 ]

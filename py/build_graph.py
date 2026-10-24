@@ -28,8 +28,7 @@ SAMPLE_TYPE = {
     "org.billthefarmer.notes_141.apk": "benign",
     "com.github.characterdog.bmicalculator_3.apk": "benign",
     "app-debug.apk": "synthetic",
-    # Add the sibling APK's file name here once it's built, e.g.:
-    # "app-debug-2.apk": "synthetic",
+    "app-debug2.apk": "synthetic",
 }
 
 # Optional friendlier display names for the graph viz. Falls back to the
@@ -37,7 +36,8 @@ SAMPLE_TYPE = {
 LABELS = {
     "org.billthefarmer.notes": "Notes (benign)",
     "com.github.characterdog.bmicalculator": "BMI Calculator (benign)",
-    "com.example.fakescamsample": "Fake Scam Sample (synthetic)",
+    "com.example.fakescamsample": "Fake Scam Sample A (synthetic)",
+    "com.example.fakescamsample2": "Fake Scam Sample B (synthetic)",
 }
 
 

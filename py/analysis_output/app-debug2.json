@@ -1,0 +1,24 @@
+{
+  "file": "app-debug2.apk",
+  "sha256": "0f84a150e6d15eeb8586048ac60cb5347f5c460f27d7a8bdb8997a817d02a81e",
+  "package_name": "com.example.fakescamsample2",
+  "permissions": [
+    "com.example.fakescamsample2.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "suspicious_permissions": [],
+  "cert_sha256": "7e0043c1f38a7b06d4cf6a58abf8e75ac3bfb66b0ae27914d2dc82f5c0cb25ee",
+  "hardcoded_urls": [
+    "https://totally-legit-crypto-investing.test/login"
+  ],
+  "hardcoded_wallet_like_strings": [
+    "0x1234567890abcdef1234567890abcdef12345678",
+    "1lRBgqQoAlpqE9QA0P6jZxba0BA",
+    "3ixFdUCfZbLFklUSG46db99CeD8"
+  ],
+  "is_webview_shell": true,
+  "webview_shell_debug": {
+    "references_webview": true,
+    "non_framework_class_count": 24
+  },
+  "errors": []
+}

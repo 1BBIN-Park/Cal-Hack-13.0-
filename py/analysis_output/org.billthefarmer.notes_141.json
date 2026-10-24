@@ -3,10 +3,10 @@
   "sha256": "ae8aa96794fc55d58916d8fe3a217912fbcc9edd5ec9fb72c547f90d97d3c0ea",
   "package_name": "org.billthefarmer.notes",
   "permissions": [
+    "android.permission.INTERNET",
     "com.android.launcher.permission.INSTALL_SHORTCUT",
     "android.permission.READ_EXTERNAL_STORAGE",
     "android.permission.WRITE_EXTERNAL_STORAGE",
-    "android.permission.INTERNET",
     "android.permission.MANAGE_EXTERNAL_STORAGE"
   ],
   "suspicious_permissions": [],

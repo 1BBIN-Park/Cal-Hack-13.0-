@@ -3,16 +3,16 @@
   "sha256": "b9d91a22d381703bdb64cc1e778f686e3f38b15d3a5a51b8c0458cabc3f70d2c",
   "package_name": "com.example.fakescamsample",
   "permissions": [
-    "android.permission.READ_SMS",
-    "android.permission.RECEIVE_SMS",
     "android.permission.INTERNET",
     "com.example.fakescamsample.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
-    "android.permission.REQUEST_INSTALL_PACKAGES"
+    "android.permission.REQUEST_INSTALL_PACKAGES",
+    "android.permission.READ_SMS",
+    "android.permission.RECEIVE_SMS"
   ],
   "suspicious_permissions": [
+    "android.permission.REQUEST_INSTALL_PACKAGES",
     "android.permission.READ_SMS",
-    "android.permission.RECEIVE_SMS",
-    "android.permission.REQUEST_INSTALL_PACKAGES"
+    "android.permission.RECEIVE_SMS"
   ],
   "cert_sha256": "7e0043c1f38a7b06d4cf6a58abf8e75ac3bfb66b0ae27914d2dc82f5c0cb25ee",
   "hardcoded_urls": [

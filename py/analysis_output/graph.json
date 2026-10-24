@@ -2,16 +2,63 @@
   "nodes": [
     {
       "id": "org.billthefarmer.notes",
-      "file": "org.billthefarmer.notes_141.apk"
+      "label": "Notes (benign)",
+      "file": "org.billthefarmer.notes_141.apk",
+      "risk_level": "low",
+      "sample": "benign"
+    },
+    {
+      "id": "com.example.fakescamsample2",
+      "label": "Fake Scam Sample B (synthetic)",
+      "file": "app-debug2.apk",
+      "risk_level": "high",
+      "sample": "synthetic"
     },
     {
       "id": "com.github.characterdog.bmicalculator",
-      "file": "com.github.characterdog.bmicalculator_3.apk"
+      "label": "BMI Calculator (benign)",
+      "file": "com.github.characterdog.bmicalculator_3.apk",
+      "risk_level": "medium",
+      "sample": "benign"
     },
     {
       "id": "com.example.fakescamsample",
-      "file": "app-debug.apk"
+      "label": "Fake Scam Sample A (synthetic)",
+      "file": "app-debug.apk",
+      "risk_level": "high",
+      "sample": "synthetic"
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "from": "com.example.fakescamsample",
+      "to": "com.example.fakescamsample2",
+      "shared": "certificate",
+      "value": "7e0043c1f38a7b06d4cf6a58abf8e75ac3bfb66b0ae27914d2dc82f5c0cb25ee"
+    },
+    {
+      "from": "com.example.fakescamsample",
+      "to": "com.example.fakescamsample2",
+      "shared": "domain",
+      "value": "totally-legit-crypto-investing.test"
+    },
+    {
+      "from": "com.example.fakescamsample",
+      "to": "com.example.fakescamsample2",
+      "shared": "wallet",
+      "value": "0x1234567890abcdef1234567890abcdef12345678"
+    },
+    {
+      "from": "com.example.fakescamsample",
+      "to": "com.example.fakescamsample2",
+      "shared": "wallet",
+      "value": "1lRBgqQoAlpqE9QA0P6jZxba0BA"
+    },
+    {
+      "from": "com.example.fakescamsample",
+      "to": "com.example.fakescamsample2",
+      "shared": "wallet",
+      "value": "3ixFdUCfZbLFklUSG46db99CeD8"
+    }
+  ]
 }

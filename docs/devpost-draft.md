@@ -9,7 +9,8 @@ Status markers in [brackets] are notes to us; remove them before submitting. Any
 warning live. [NOT LIVE YET, add once the loop works: "Rules decide the risk; Claude explains it
 in 中文 and English."]
 
-**Tracks:** Anthropic · Spacetime [+ Best People-First Hack, Best Security Hack if Sophia agrees]
+**Tracks:** Anthropic · Spacetime · Best People-First Hack · Best Security Hack [+ Beginner: check we
+qualify first]
 
 ---
 
@@ -17,9 +18,14 @@ in 中文 and English."]
 Chinese-American elderly immigrants get pushed into "investment app" scams: a friendly text or
 WhatsApp message leads to a fake crypto-trading app installed from a link (sideloaded, outside
 the app store). They can't tell the app is a scam until the money is gone.
-[Sophia owns this section. Add our real story: someone we know or talked to. The Anthropic track
-asks for a problem "you lived or heard from someone". Add one statistic or news story with a
-source (FBI IC3, FTC, news) before making any claim about how often or how isolated victims are.]
+
+Americans 60 and older reported $4.88 billion in losses to the FBI's Internet Crime Complaint
+Center in 2024, up 43% from 2023 and the most of any age group; investment fraud alone took $1.83 billion, often through fictitious crypto
+platforms and trading apps. A growing number of these cases are "pig butchering": scammers build
+trust online or through messaging apps, then steer victims to fake crypto investments
+([InvestmentNews, Apr 2025](https://www.investmentnews.com/ria-news/elder-fraud-complaints-surge-past-48-billion-as-investment-scams-lead-losses/260273), citing the FBI's 2024 Internet Crime Report).
+[Sophia owns this section. Still needed: our real story, someone we know or talked to. The
+Anthropic track asks for a problem "you lived or heard from someone".]
 
 ## What it does
 - **Pair two phones** with a 6-character code: the elder's phone and a family member's. No accounts.
@@ -90,13 +96,16 @@ high-risk verdict.
 - Per-family access control on verdicts; a larger labeled sample set for accuracy numbers.
 
 ## Built with
-SpacetimeDB · TypeScript · React · Vite · Python · androguard · Claude (Anthropic) · Netlify ·
+SpacetimeDB · TypeScript · React · Vite · Python · androguard · Flask · Claude (Anthropic) · ngrok · Netlify ·
 Claude Code
 
 ## Disclosures
 - Claude Code was used to help write, test and review code and docs.
 - Test verdicts were sent by hand with `curl` before the pipeline was live [update when live].
 - Phishing messages from real scam reports (shared by Sophia) were used as text only, never opened.
+- APK samples: one synthetic scam-pattern sample built by our team to show real scam-app
+  patterns (WebView-only shell, hardcoded wallet addresses, SMS-reading permission), not live
+  malware, plus two benign comparison apps [Sophia: confirm they're open-source apps].
 - The verdict table is publicly readable (hackathon limitation).
 - Pasted SMS text is sent to our analysis service and to Claude.
 - Small sample set, so accuracy numbers are indicative only.

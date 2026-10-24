@@ -15,8 +15,8 @@
     go wrong for the people using it. Prize: $5,000 Claude credits + 1Y Claude Max 20x.
   - Spacetime: SpacetimeDB as the core real-time backend (live shared state, instant sync),
     meaningfully used, not added on the side. Prizes: $2,048 / $1,024 / $512.
-  - PROPOSED (Anthony, Sophia to OK): general "Best People-First Hack"; "Best Security Hack"
-    (Armadin, criteria TBA).
+  - AGREED (Sophia, Slack Sat ~13:50, relayed): general "Best People-First Hack"; "Best Security
+    Hack" (Armadin, criteria TBA). Beginner: Sophia wants it; check eligibility first.
   - Both: public GitHub repo required (repo is currently PRIVATE, so make it public before submitting)
 
 ## Team
@@ -136,7 +136,9 @@ elder web UI --upload--> analysis service (static analysis -> rules -> Claude)
 
 ## Honesty
 Mocked, hardcoded, or seeded parts we will disclose in the demo:
-- Test APKs may be self-built "scam-pattern" samples, not real malware. Say which.
+- APK samples: ONE synthetic scam-pattern sample built by our team (not live malware) + two benign
+  comparison apps (Sophia, Slack Sat ~13:56, relayed). The benign BMI calculator scores "medium"
+  (WebView-shell flag): a known false positive.
 - Small sample set, so precision/recall numbers are indicative only
 - Claude may mistranslate urgency or soften a warning (known failure mode)
 - report_verdict is locked to the service identity in code (smoke-tested), but the existing test DB
@@ -271,3 +273,12 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   not live). Sophia: fill Devpost Inspiration (real story + sourced stat), say whether APK samples
   are real scam apps, confirm README step 3 / Status / Disclosures. NEXT: Sophia's HTTPS service
   URL → real two-phone loop by 6 PM.
+- 14:35 Sat Anthony: Sophia pushed the pipeline (py/app.py, score_apps.py, explain_with_claude.py;
+  no secrets/APKs). One real verdict landed in the demo DB (fideitly…top, high, EN/ZH; checked by
+  SQL). Her ngrok URL (shared on Slack; keep it out of the repo) was OFFLINE (ERR_NGROK_3200) at
+  14:30, so the app → service loop is untested. Sent her (relayed by Anthony) fixes in her area:
+  app.py reads `message_text` but the agreed endpoint (11:45 entry) says `message` (SMS dropped); upload filename
+  path traversal; debug=True on a public URL; requests.get downloads link bodies (contradicts the
+  no-auto-download decision); .gov/subdomain false positives. Docs now carry her sourced stat and
+  sample disclosure; tracks agreed. Name: Anthony proposed SecondLook · 多看一眼, Sophia to answer.
+  NEXT: tunnel back + fixes → two-phone loop → Netlify rebuild.

@@ -85,10 +85,11 @@ softened sentence can't turn a high-risk verdict into a low one.
 | SpacetimeDB module + identity lock, live on Maincloud | Built, tested |
 | Link extraction (phishing tricks, Chinese domains) | Built, 39 regression cases |
 | Static APK feature extraction ([`py/analyze_apk.py`](py/analyze_apk.py)) | In repo; Sophia reports tested on 3 samples |
-| Analysis service: rules engine + Claude + `report_verdict` | **Not live yet** (Sophia) |
+| Analysis service: rules engine + Claude + `report_verdict` ([`py/app.py`](py/app.py)) | In repo; wrote a real verdict to the demo DB; **not yet tested from the app** (Sophia) |
 | Android share-target app | Planned (Phase 2) |
 
-Until the analysis service is live, verdicts shown in testing were sent by hand with `curl`.
+Until the analysis service is live, verdicts shown in testing were sent by hand with `curl`,
+except one test verdict written by the service itself.
 
 ## Run it locally
 
@@ -107,7 +108,7 @@ database owner authorizes the analysis service's identity
 (`spacetime call --server local scamguard-7xwfd set_service_identity <hex>`; see
 [`docs/report-verdict-spike.md`](docs/report-verdict-spike.md)). Copy `.env.example` to
 `.env.local` to point the app at another database or at the analysis service
-(`VITE_ANALYSIS_URL`); the service itself is not in this repo yet.
+(`VITE_ANALYSIS_URL`). The analysis service is [`py/app.py`](py/app.py) (Flask; Sophia).
 
 Tests:
 ```bash
@@ -132,11 +133,13 @@ scripts/test-links.sh    # 39 link-extraction cases (strings only, nothing is fe
   Code while building: to write and review code, run tests and draft docs. A Claude Code review
   subagent checked Anthony's commits before they landed.
 - **Libraries/APIs/hosting:** SpacetimeDB (Maincloud), React, Vite, esbuild, TypeScript, Node.js,
-  Python, androguard, Netlify.
+  Python, androguard, Flask, Anthropic Python SDK, ngrok, Netlify.
 - **Test data:** test verdicts sent with `curl`; phishing messages from real scam reports (shared
   by Sophia) used as text only, never opened. Any APK samples are analyzed statically, never
-  installed, and APK files are never committed. [Sophia: say whether samples are real scam APKs
-  or self-built scam-pattern samples.]
+  installed, and APK files are never committed. Samples: one synthetic scam-pattern APK built by our
+  team to show real scam-app patterns (WebView-only shell, hardcoded wallet addresses,
+  SMS-reading permission), not live malware, plus two benign comparison apps [Sophia: confirm
+  they're open-source apps].
 - **Limitations:** the verdict table is publicly readable so relatives can subscribe; anyone with
   the database name could read all sessions' verdicts. A production version needs per-session
   access control. Small sample set, so accuracy numbers are indicative only.

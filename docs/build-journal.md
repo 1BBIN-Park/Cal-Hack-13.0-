@@ -10,8 +10,8 @@ or a recorded test shows; anything not live yet is marked.
   someone, 3) it works, one thing done well, 4) Claude does something that matters and you know
   where it could go wrong for the people using it.
 - **Spacetime** (targeted): SpacetimeDB as the core real-time backend, not added on the side.
-- **Best People-First Hack** (general prize; proposed, not yet agreed with Sophia).
-- **Best Security Hack** (Armadin; criteria "coming soon"; proposed, not yet agreed).
+- **Best People-First Hack** (general prize; agreed with Sophia, Slack Sat ~13:50, relayed).
+- **Best Security Hack** (Armadin; criteria "coming soon"; agreed, same message).
 - General judging: impact, quality, technical complexity, creativity. Live demo required.
   Devpost due Sunday 9:00 AM; judging 10:30-12:30 with a 2-minute pitch.
 
@@ -23,9 +23,11 @@ or a recorded test shows; anything not live yet is marked.
   which ("AI explanation (Claude)" vs "Found by rules"). Built and visible in the UI.
 - Where Claude could go wrong is written down (HACK.md Honesty): mistranslated urgency, softened
   warnings. The pasted SMS going to Claude is disclosed too.
-- Not live yet (Sat 11:18): the Claude call and Sophia's pipeline. Verdicts shown so far were
-  sent by hand with curl. Planned: the full SMS goes to the rules + Claude so the explanation can
-  name the manipulation (fake deadline, "reply Y" trick).
+- Found Sat ~14:30: Sophia's pipeline (rules + Claude Haiku) had written one real verdict to the demo DB:
+  a Fidelity typosquat on `.top`, `high` by the rules, EN/中文 explanation by Claude. The full
+  app → service loop is NOT tested yet; the SMS field is dropped until a field-name fix lands.
+- Stat checked against its source (InvestmentNews citing the FBI 2024 IC3 report: $4.88B lost by
+  people 60+, $1.83B investment fraud); two unsupported phrases from her Slack draft were left out of the Devpost.
 - Still needed for criterion 2: a real conversation with someone affected.
 
 **Spacetime**
@@ -53,8 +55,14 @@ or a recorded test shows; anything not live yet is marked.
   bugs found by testing or review (see log). Covered by 39 cases in `scripts/tests/links.test.ts`
   (run `scripts/test-links.sh`).
 - From Fri 20:22 on, every commit made from Anthony's Claude sessions went through an independent
-  review agent (`plan-reviewer`) first. It caught the bugs credited to it below. Commits made on
-  the GitHub website (dfb7fcc, 92cf680, 2ec5840) weren't reviewed.
+  review agent (`plan-reviewer`) first. It caught the bugs credited to it below (including keeping
+  the live tunnel hostname out of the public repo). Commits made on the GitHub website (dfb7fcc,
+  92cf680, 2ec5840) weren't reviewed.
+- Integration review of the analysis service before the first live loop found a dropped SMS
+  field, upload path traversal, `debug=True` on a public URL, and link bodies being downloaded
+  (against a locked safety decision). Fix pending (Sophia).
+- Known false positive, to disclose with accuracy numbers: a benign BMI calculator scores
+  `medium` (WebView-shell flag).
 
 ## Log
 
@@ -135,3 +143,61 @@ or a recorded test shows; anything not live yet is marked.
 - **What:** `/analyze-url` gets the whole pasted message as optional `message`, so Sophia's rules
   can score the sender, urgency and "reply Y" trick and Claude can explain them, once her service
   is live. Disclosed in HACK.md Honesty. Commit 61b8092.
+
+### Sat ~14:30 (per status log): Sophia's pipeline landed; first real verdict in the demo DB (Anthropic)
+- **What:** Sophia pushed the detection pipeline (commit 5d82863, committed 13:57): `py/app.py`
+  (Flask service), `py/score_apps.py` (rule scorer), `py/explain_with_claude.py` (Claude Haiku
+  writes the EN/中文 explanation). Anthony's Claude session queried the Maincloud demo DB by SQL
+  and found one real verdict written by her service: `fideitly-intenrational.top`, risk `high`,
+  reasons (paraphrased from the DB row): the domain impersonates Fidelity, the .top ending is common
+  in scam links, and the link couldn't be reached to follow redirects; with EN and ZH explanations.
+- **Not tested yet:** the app → service loop. Sophia's tunnel was offline at 14:30, so no verdict
+  has yet gone from our web app through her service to the phones.
+- **Why it matters:** the risk level came from the score rules, not from Claude; Claude only wrote
+  the explanation. This is the "rules decide, Claude explains" design, now running on real code.
+- **Pitch line:** "The rules said high risk because it's a Fidelity typosquat on a .top domain;
+  Claude's only job was to say that in words a grandmother understands, in her language."
+
+### Sat ~14:30 (per status log): Integration review of the analysis service, before the first live loop (security / quality)
+- **What:** Anthony's Claude session read `py/app.py` (commit 5d82863) before connecting the app
+  to it, and found:
+  - Field mismatch: the client sends `message` (agreed at 11:45), the service reads
+    `message_text`, so the pasted SMS would be silently dropped.
+  - The upload is saved under the client-supplied filename (path traversal on a public URL).
+  - `debug=True` on a service exposed through a public tunnel.
+  - `requests.get` on the link downloads the response body, which contradicts the locked decision
+    "never auto-download an APK from a live link".
+  - Real sites (`.gov`, brand subdomains) get flagged as impersonation (false positives).
+- **Found by:** Anthony's Claude session (code read, not a live test).
+- **Status:** found, fix pending (Sophia). Sent to her, relayed by Anthony; `py/` is her area, so
+  we did not change it.
+- **Why it matters:** each of these could have shipped silently on a public URL: one loses the
+  very SMS the explanation depends on, two are server-side security holes, one breaks a safety
+  promise we made for the stage.
+
+### Sat 14:44: Kept the live tunnel hostname out of a soon-public repo (security)
+- **What:** The draft HACK.md status line would have put Sophia's live tunnel hostname right next
+  to the list of its open weaknesses, in a repo about to go public.
+- **Found by:** the review agent (`plan-reviewer`), before commit.
+- **Fix:** replaced with "shared on Slack"; git history checked: 0 occurrences of the hostname.
+  Commit 1a632be.
+- **Why it matters:** a public map of "this server, and here is how to break it" before the fixes
+  land.
+
+### Sat 14:44: Devpost statistic checked against its source (Anthropic, honesty)
+- **What:** Sophia's statistic: InvestmentNews (Apr 2025), citing the FBI's 2024 Internet Crime
+  Report: $4.88B in reported losses for people 60+, $1.83B of it investment fraud. Checked
+  against the InvestmentNews article (the FBI report itself was not read directly). Two phrases
+  in her Slack draft were not in the source ("outside official app stores", "growing share of losses"),
+  so they were left out; we also tightened the wording to "reported to the FBI's IC3" and corrected
+  "samples" to one synthetic sample. Commit 1a632be.
+- **Why it matters:** every number in the pitch traces to a source we read.
+
+### Sat ~14:40: Known false positive: benign BMI calculator scores "medium" (quality, honesty)
+- **What:** In Sophia's scored output (`py/analysis_output/scored_results.json`, commit 5d82863),
+  the benign BMI calculator comparison app (`com.github.characterdog.bmicalculator`; that it's
+  open-source is unconfirmed, Sophia to say) scores
+  `medium` (score 3), driven by the WebView-shell flag plus hardcoded URLs (Play Store, Crowdin,
+  GitHub). The notes app scores `low`; the synthetic scam sample scores `high` (7).
+- **Status:** known false positive; to be disclosed together with the accuracy numbers.
+- **Why it matters:** judges will ask about false positives; we can show one we know about.

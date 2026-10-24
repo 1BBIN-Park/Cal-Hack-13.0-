@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 export type Lang = 'zh' | 'en';
 
 const STRINGS = {
-  appName: { zh: '应用安全检查', en: 'Scam App Check' },
+  appName: { zh: '多看一眼', en: 'SecondLook' },
   tagline: {
     zh: '收到陌生的投资应用或链接？先检查一下，家人也能看到结果。',
     en: 'Got an unfamiliar investment app or link? Check it first, and your family sees the result too.',

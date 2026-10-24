@@ -1,11 +1,11 @@
-# Scam App Check · 应用安全检查
+# SecondLook · 多看一眼
 
 **Cal Hacks 13.0 · Team: Sophia & Anthony**
 
 Chinese-American elderly immigrants get pushed, through text messages and WhatsApp, into
 installing fake crypto-trading apps. They can't tell the app is a scam until the money is gone.
 
-Scam App Check lets an elder check a suspicious **app (APK) or link** before installing or paying.
+SecondLook (多看一眼, "take one more look") lets an elder check a suspicious **app (APK) or link** before installing or paying.
 The design: a **rules engine** decides the risk from static-analysis signals, **Claude** explains
 the verdict in plain Chinese and English, and a **paired family member** sees the same warning
 live on their own phone. The pairing, live sync and screens are built; the rules engine and
@@ -138,8 +138,9 @@ scripts/test-links.sh    # 39 link-extraction cases (strings only, nothing is fe
   by Sophia) used as text only, never opened. Any APK samples are analyzed statically, never
   installed, and APK files are never committed. Samples: one synthetic scam-pattern APK built by our
   team to show real scam-app patterns (WebView-only shell, hardcoded wallet addresses,
-  SMS-reading permission), not live malware, plus two benign comparison apps [Sophia: confirm
-  they're open-source apps].
+  SMS-reading permission), not live malware, plus two benign comparison apps, the open-source F-Droid apps
+  [Notes](https://f-droid.org/en/packages/org.billthefarmer.notes/) and
+  [BMI Calculator](https://f-droid.org/en/packages/com.github.characterdog.bmicalculator/).
 - **Limitations:** the verdict table is publicly readable so relatives can subscribe; anyone with
   the database name could read all sessions' verdicts. A production version needs per-session
   access control. Small sample set, so accuracy numbers are indicative only.

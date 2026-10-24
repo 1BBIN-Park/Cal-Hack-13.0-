@@ -151,7 +151,7 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
 ## Pitch
-- One-liner: <Product> helps Chinese-American elders and their families catch sideloaded scam apps by explaining real static-analysis red flags in plain EN/中文 and alerting family instantly.
+- One-liner: SecondLook (多看一眼) helps Chinese-American elders and their families catch sideloaded scam apps by explaining real static-analysis red flags in plain EN/中文 and alerting family instantly.
 - Roles: device A <TBD>, device B Anthony, narrator <TBD>, tech answers <TBD>, backup <TBD>
 
 ## Status log
@@ -282,3 +282,11 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   no-auto-download decision); .gov/subdomain false positives. Docs now carry her sourced stat and
   sample disclosure; tracks agreed. Name: Anthony proposed SecondLook · 多看一眼, Sophia to answer.
   NEXT: tunnel back + fixes → two-phone loop → Netlify rebuild.
+- 15:35 Sat Anthony: Name agreed: SecondLook · 多看一眼 (Sophia, Slack ~15:00, relayed); renamed
+  in the UI (title, pairing hero), README and Devpost. Package/DB names unchanged. Sophia pushed
+  her review fixes (61fadd9; checked in code: `message` read, fixed upload name, debug off,
+  stream=True + private-IP block, allowlist, 20MB cap, Haiku 5.5). Benign samples confirmed as
+  F-Droid open-source apps. Her service was unreachable at 15:30 (ngrok up, Flask down:
+  ERR_NGROK_8012), so the loop is still untested. Small asks sent: unresolvable domains are
+  reported as "private address"; redirect hops aren't checked before they're contacted.
+  NEXT: service up → browser-style check → Netlify build → two-phone loop.

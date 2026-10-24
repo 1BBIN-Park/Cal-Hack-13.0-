@@ -3,7 +3,7 @@
 Status markers in [brackets] are notes to us; remove them before submitting. Anything marked
 [NOT LIVE YET] must be either finished or reworded before Sun 9:00 AM.
 
-**Project name:** Scam App Check · 应用安全检查 [name TBD together]
+**Project name:** SecondLook · 多看一眼
 
 **Tagline:** Check a suspicious app or link before you install or pay, and your family sees the
 warning live. [NOT LIVE YET, add once the loop works: "Rules decide the risk; Claude explains it
@@ -105,7 +105,9 @@ Claude Code
 - Phishing messages from real scam reports (shared by Sophia) were used as text only, never opened.
 - APK samples: one synthetic scam-pattern sample built by our team to show real scam-app
   patterns (WebView-only shell, hardcoded wallet addresses, SMS-reading permission), not live
-  malware, plus two benign comparison apps [Sophia: confirm they're open-source apps].
+  malware, plus two benign comparison apps, the open-source F-Droid apps
+  [Notes](https://f-droid.org/en/packages/org.billthefarmer.notes/) and
+  [BMI Calculator](https://f-droid.org/en/packages/com.github.characterdog.bmicalculator/).
 - The verdict table is publicly readable (hackathon limitation).
 - Pasted SMS text is sent to our analysis service and to Claude.
 - Small sample set, so accuracy numbers are indicative only.

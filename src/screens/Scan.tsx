@@ -17,9 +17,24 @@ const RESULT_TIMEOUT_MS = 60_000;
 
 // Elders paste whole SMS messages or bare domains, so pull out the first URL
 // and add a scheme when it's missing.
-export function extractUrl(text: string): string | null {
+export function extractUrl(input: string): string | null {
+  // Cap the work on huge pastes (the join regex is quadratic on junk input).
+  const text = input.slice(0, 4000);
+  // Text copied out of a screenshot (iPhone Live Text) keeps the visual line
+  // breaks, splitting links like "https://fideitly-\nintenrational.top/\n...".
+  // Rejoin only when the next line itself looks like URL text (lowercase start
+  // and a connector, or nothing else on the line), so "https://evil.top.\nclick
+  // to confirm" stays evil.top and a following sentence isn't glued on.
+  let joined = text;
+  for (let prev = ''; prev !== joined; ) {
+    prev = joined;
+    joined = joined.replace(
+      /([Hh][Tt][Tt][Pp][Ss]?:\/\/\S*[-/.?=&])[ \t]*\r?\n[ \t]*(?=[a-z0-9]\S*(?:[-/.?=&]|[ \t]*(?:\r?\n|$)))/,
+      '$1'
+    );
+  }
   // ASCII URL characters only: Chinese SMS text has no spaces to end the URL.
-  const withScheme = text.match(/https?:\/\/[A-Za-z0-9\-._~:/?#[\]@!$&*+;=%]+/i);
+  const withScheme = joined.match(/https?:\/\/[A-Za-z0-9\-._~:/?#[\]@!$&*+;=%]+/i);
   if (withScheme) return withScheme[0].replace(/[.,;:!?)\]]+$/, '');
   const bare = text.match(/\b[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}\b(\/[^\s<>"']*)?/i);
   return bare ? `https://${bare[0]}` : null;

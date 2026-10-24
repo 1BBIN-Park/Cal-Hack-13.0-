@@ -28,7 +28,7 @@ load_dotenv()
 INPUT_PATH = Path("analysis_output/scored_results.json")
 OUTPUT_PATH = Path("analysis_output/verdicts.json")
 
-MODEL = "claude-haiku-4-5"  # fast + cheap, plenty for this translation task
+MODEL = "claude-haiku-5-5"  # fast + cheap, plenty for this translation task
 
 SYSTEM_PROMPT = """You explain Android app security warnings to non-technical \
 elderly users and their family members. You are given a risk level and a list \
@@ -49,9 +49,11 @@ Rules:
 """
 
 
-def build_user_prompt(risk_level, reasons):
+def build_user_prompt(risk_level, reasons, subject_type="app"):
     reasons_text = "\n".join(f"- {r}" for r in reasons)
+    subject_word = "link" if subject_type == "link" else "app"
     return f"""Risk level: {risk_level}
+What was analyzed: a {subject_word} (refer to it as "this {subject_word}" in your explanation, not "this app" if it's a link).
 
 Technical reasons flagged:
 {reasons_text}
@@ -59,13 +61,13 @@ Technical reasons flagged:
 Write the explanation in all four languages now."""
 
 
-def get_explanation(client, risk_level, reasons):
+def get_explanation(client, risk_level, reasons, subject_type="app"):
     try:
         response = client.messages.create(
             model=MODEL,
             max_tokens=1200,
             system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": build_user_prompt(risk_level, reasons)}],
+            messages=[{"role": "user", "content": build_user_prompt(risk_level, reasons, subject_type)}],
         )
         raw_text = response.content[0].text.strip()
         # Claude is instructed to return raw JSON, but strip code fences just in case.

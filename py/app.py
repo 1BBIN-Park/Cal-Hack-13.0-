@@ -22,6 +22,8 @@ To make this reachable from a phone/teammate's app during the demo, expose it wi
 
 import os
 import re
+import socket
+import ipaddress
 import difflib
 import tempfile
 from pathlib import Path
@@ -44,6 +46,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # handles OPTIONS preflight automatically for the /analyze-url JSON endpoint
+app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB upload cap
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 SPACETIME_TOKEN = os.getenv("SPACETIME_TOKEN")
@@ -68,6 +71,44 @@ KNOWN_BRANDS = [
 # their own, but a useful weak signal combined with other factors).
 SUSPICIOUS_TLDS = [".top", ".cfd", ".xyz", ".click", ".work", ".gq", ".tk", ".fit", ".loan"]
 
+# Real official domains/subdomains for the brands above, so we don't flag the
+# genuine site (irs.gov, secure.chase.com, etc.) as impersonating itself.
+# Judges may well type the real site during the demo.
+ALLOWED_OFFICIAL_DOMAINS = {
+    "irs.gov", "medicare.gov", "ssa.gov", "usps.com", "dmv.ca.gov",
+    "secure.chase.com", "chase.com", "bankofamerica.com",
+    "wellsfargo.com", "paypal.com", "venmo.com", "apple.com",
+    "amazon.com", "fedex.com", "ups.com", "santander.com", "santanderbank.com",
+    "coinbase.com", "binance.com", "fidelity.com",
+}
+
+
+def is_allowed_official_domain(hostname):
+    host_lower = hostname.lower()
+    return any(
+        host_lower == d or host_lower.endswith("." + d)
+        for d in ALLOWED_OFFICIAL_DOMAINS
+    )
+
+
+# Private/loopback/link-local ranges we refuse to let the link-check reach,
+# so a malicious link can't make this server probe internal/local addresses
+# (e.g. localhost:4040, 169.254.x.x cloud metadata, LAN devices).
+def is_private_host(hostname):
+    try:
+        resolved_ips = {info[4][0] for info in socket.getaddrinfo(hostname, None)}
+    except Exception:
+        # Can't resolve -> treat as unsafe to contact.
+        return True
+    for ip_str in resolved_ips:
+        try:
+            ip = ipaddress.ip_address(ip_str)
+        except ValueError:
+            return True
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+            return True
+    return False
+
 
 def normalize_url(raw_url):
     """Lowercase scheme/host, keep path/query case as-is (teammate's HTTPS://... ask)."""
@@ -82,6 +123,12 @@ def looks_like_typosquat(hostname):
     catches letter-swap tricks like 'fideitly' for 'fidelity'. Not a
     rigorous check — good enough to flag obvious cases for a hackathon demo."""
     host_lower = hostname.lower()
+
+    # The real official site (or a real subdomain of it) is never flagged as
+    # impersonating itself.
+    if is_allowed_official_domain(host_lower):
+        return False, None
+
     collapsed = host_lower.replace("-", "").replace(".", "")
 
     # Split hostname into dot-separated labels so we can fuzzy-compare each
@@ -116,19 +163,38 @@ def analyze_url_signals(url, message_text=None):
     score = 0
 
     url = normalize_url(url)
+    hostname_initial = urlsplit(url).hostname or ""
 
     final_url = url
-    try:
-        resp = requests.get(url, allow_redirects=True, timeout=5)
-        final_url = resp.url
-        if final_url != url:
-            reasons.append(f"Link redirects to a different address: {final_url}")
-            score += 1
-    except Exception:
-        # If we can't reach it, that's fine — we still analyze the URL itself.
-        reasons.append("Could not reach the link to follow redirects; analyzing the URL as given.")
 
-    hostname = urlsplit(final_url).hostname or ""
+    # Never contact a private/loopback/internal address — a malicious link
+    # must not be able to make this server probe localhost or the LAN.
+    if hostname_initial and is_private_host(hostname_initial):
+        reasons.append("Link points to a private/internal address; not following it.")
+        hostname = hostname_initial
+    else:
+        try:
+            # stream=True + close() without reading: we only need the final
+            # redirect destination and status, never the response body. This
+            # keeps the locked "never auto-download from a link" rule intact
+            # even for APK links, and avoids pulling large/slow bodies.
+            resp = requests.get(url, allow_redirects=True, timeout=5, stream=True)
+            final_url = resp.url
+            resp.close()
+            if final_url != url:
+                reasons.append(f"Link redirects to a different address: {final_url}")
+                score += 1
+        except Exception:
+            # If we can't reach it, that's fine — we still analyze the URL itself.
+            reasons.append("Could not reach the link to follow redirects; analyzing the URL as given.")
+
+        hostname = urlsplit(final_url).hostname or ""
+
+        # The redirect target itself might land on a private address — check
+        # again before trusting anything derived from final_url.
+        if hostname and is_private_host(hostname):
+            reasons.append("Link redirects to a private/internal address.")
+            score += 1
 
     is_typosquat, brand = looks_like_typosquat(hostname)
     if is_typosquat:
@@ -196,7 +262,10 @@ def analyze_apk_endpoint():
     uploaded = request.files["file"]
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        apk_path = Path(tmpdir) / uploaded.filename
+        # Never trust the client-supplied filename (could contain path
+        # traversal like "../../x" or an absolute path) — always save under
+        # a fixed name inside our own temp dir.
+        apk_path = Path(tmpdir) / "upload.apk"
         uploaded.save(apk_path)
 
         result = analyze_single_apk(str(apk_path))
@@ -205,7 +274,7 @@ def analyze_apk_endpoint():
         # score_apps.py for the correlation graph instead).
         score, risk_level, reasons = score_single_app(result, shared_certs={})
 
-        explanations = get_explanation(claude_client, risk_level, reasons) if claude_client else {
+        explanations = get_explanation(claude_client, risk_level, reasons, subject_type="app") if claude_client else {
             "explanation_en": "", "explanation_zh": "", "explanation_es": "", "explanation_vi": ""
         }
 
@@ -231,7 +300,9 @@ def analyze_url_endpoint():
     data = request.get_json(silent=True) or {}
     url = data.get("url")
     session_id = data.get("session_id", "UNKNOWN_SESSION")
-    message_text = data.get("message_text")  # optional, per teammate's suggestion
+    # Teammate's app sends the field as "message" — also accept "message_text"
+    # for backward compatibility with earlier testing.
+    message_text = data.get("message") or data.get("message_text")
 
     if not url:
         return jsonify({"error": "missing 'url' in JSON body"}), 400
@@ -239,7 +310,7 @@ def analyze_url_endpoint():
     reasons, score = analyze_url_signals(url, message_text)
     risk_level = risk_level_from_url_score(score)
 
-    explanations = get_explanation(claude_client, risk_level, reasons) if claude_client else {
+    explanations = get_explanation(claude_client, risk_level, reasons, subject_type="link") if claude_client else {
         "explanation_en": "", "explanation_zh": "", "explanation_es": "", "explanation_vi": ""
     }
 
@@ -267,4 +338,7 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     print(f"[*] Starting service on http://127.0.0.1:{port}")
     print(f"[*] report_verdict target: {REPORT_VERDICT_URL}")
-    app.run(host="0.0.0.0", port=port, debug=True)
+    # debug=False: the Flask debugger must not be reachable from a public
+    # ngrok URL — its interactive error pages can leak the SMS/link text
+    # and let anyone run arbitrary code via the debugger console.
+    app.run(host="0.0.0.0", port=port, debug=False)

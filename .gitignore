@@ -15,3 +15,5 @@ __pycache__/
 # SpacetimeDB
 spacetime.local.json
 *.tsbuildinfo
+*.keystore
+*.jks

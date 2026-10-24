@@ -1,0 +1,35 @@
+{
+  "rows": [
+    {
+      "file": "org.billthefarmer.notes_141.apk",
+      "risk_level": "low",
+      "ground_truth": "benign",
+      "flagged": false,
+      "outcome": "TN"
+    },
+    {
+      "file": "com.github.characterdog.bmicalculator_3.apk",
+      "risk_level": "medium",
+      "ground_truth": "benign",
+      "flagged": true,
+      "outcome": "FP"
+    },
+    {
+      "file": "app-debug.apk",
+      "risk_level": "high",
+      "ground_truth": "scam",
+      "flagged": true,
+      "outcome": "TP"
+    }
+  ],
+  "confusion_matrix": {
+    "tp": 1,
+    "fp": 1,
+    "tn": 1,
+    "fn": 0
+  },
+  "precision": 0.5,
+  "recall": 1.0,
+  "accuracy": 0.6666666666666666,
+  "n": 3
+}

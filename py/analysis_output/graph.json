@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "org.billthefarmer.notes",
+      "file": "org.billthefarmer.notes_141.apk"
+    },
+    {
+      "id": "com.github.characterdog.bmicalculator",
+      "file": "com.github.characterdog.bmicalculator_3.apk"
+    },
+    {
+      "id": "com.example.fakescamsample",
+      "file": "app-debug.apk"
+    }
+  ],
+  "edges": []
+}

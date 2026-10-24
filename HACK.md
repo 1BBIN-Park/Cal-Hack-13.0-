@@ -66,9 +66,9 @@ table verdict {
 reducer report_verdict(...)  // called by Sophia's pipeline
   // rejects callers whose identity isn't the analysis service's (token from POST /v1/identity).
   // Sophia OK'd locking to her identity (Slack, Sat 00:54, relayed by Anthony).
-  // Design PROPOSED by Anthony, Sophia to ack: private config table; the publisher is the DB
-  // owner and authorizes her identity via set_service_identity(hex) (no hex in the public
-  // repo); until then her calls get HTTP 530.
+  // Design (Anthony; Sophia OK'd it on Slack Sat ~11:45, relayed): private config table; the
+  // publisher is the DB owner and authorizes her identity via set_service_identity(hex) (no hex
+  // in the public repo); until then her calls get HTTP 530.
 ```
 
 ## Cut list
@@ -138,6 +138,8 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
   publish with the service authorized.
 - Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
+- Pasted SMS text is sent to the analysis service and to Claude (Anthropic) for scoring and the
+  explanation. Real messages can contain names, numbers or codes.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
@@ -236,3 +238,11 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   host, user:pass@ removed, trailing / on bare hosts. The preview shows the written form when it
   differs; the UI makes no risk call. Sophia: a mixed-script / look-alike host rule would catch
   the аpple trick.
+- 11:45 Sat Anthony: Sophia (Slack, relayed) re-minted her token (new identity not in git
+  history, checked), removed py/.env, OK'd the owner-authorizes design, will lowercase URLs, and
+  agreed to an optional message field. Published locked demo DB scamguard-demo-158734 on Maincloud
+  and authorized her identity (anonymous + other identities get 530, checked). Endpoint now:
+  POST /analyze-url JSON {url, session_id, message?}; message = the whole pasted text (≤4000
+  chars, client-side cap only), omitted when the paste is nothing but the link. Privacy: in
+  Honesty. Sophia: please don't log the message body (request/debug logs, error traces). Old open test DB scamguard-test-311c81 still exists
+  (phone preview); delete before demo / going public. NEXT: wire Scan to Sophia's live service.

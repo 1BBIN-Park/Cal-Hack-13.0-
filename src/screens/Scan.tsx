@@ -3,7 +3,7 @@ import { useTable } from 'spacetimedb/react';
 import { tables } from '../module_bindings';
 import { VerdictCard, sortNewestFirst } from '../components/VerdictCard';
 import { useLang, type StringKey } from '../i18n';
-import { extractLink } from '../links';
+import { extractLink, type ExtractedLink } from '../links';
 
 // Sophia's analysis service. The /analyze path and form field names are
 // Anthony's assumption until Sophia's service exists (see HACK.md status log).
@@ -77,10 +77,19 @@ export function Scan({ session }: { session: string }) {
     submit('/analyze', { body });
   }
 
-  function checkLink(url: string) {
+  // `message` (optional, agreed with Sophia): the whole pasted text, so her
+  // rules can score the sender, urgency wording and the "reply Y" trick, and
+  // Claude can explain them. Omitted when the paste is just the link.
+  function checkLink(link: ExtractedLink, pasted: string) {
+    const normalized = pasted.normalize('NFKC').replace(/\u3002/g, '.');
+    const besidesLink = [link.written, link.written.replace(/^https?:\/\//i, '')]
+      .reduce((text, form) => text.replace(form, ''), normalized)
+      .replace(/[\s\p{P}]/gu, '');
+    // Cap by code points so an emoji isn't split in half.
+    const message = Array.from(pasted.trim()).slice(0, 4000).join('');
     submit('/analyze-url', {
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, session_id: session }),
+      body: JSON.stringify({ url: link.url, session_id: session, ...(besidesLink ? { message } : {}) }),
     });
   }
 
@@ -142,7 +151,7 @@ export function Scan({ session }: { session: string }) {
         className="link-form"
         onSubmit={e => {
           e.preventDefault();
-          if (found && !busy) checkLink(found.url);
+          if (found && !busy) checkLink(found, link);
         }}
       >
         <label htmlFor="link">{t('orPasteLink')}</label>

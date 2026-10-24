@@ -17,6 +17,9 @@ Cal Hacks 13.0 project: scam app warning system (2 people, 36 hours).
 - The Claude API key stays server-side in `.env`. Never put it in client code or commits.
 - Never commit APK files. Only statically analyze scam samples; never install them.
 - Subagents don't edit HACK.md or CLAUDE.md. The main session updates them.
+- Before every commit, and before proposing any architecture or scope change, run the
+  `plan-reviewer` subagent on the staged diff or plan. Fix its blockers before committing. Show the
+  human its verdict. If you disagree with a finding, say so instead of silently ignoring it.
 - After finishing a task: add a Status log line to HACK.md (time, name, what changed, NEXT), commit, push.
 
 ## Commands

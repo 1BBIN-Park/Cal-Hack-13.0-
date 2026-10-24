@@ -1,5 +1,13 @@
 .env
 .env.*
+!.env.example
 node_modules/
+dist/
+__pycache__/
+.venv/
 *.apk
+*.xapk
+*.apks
+*.aab
+*.dex
 .DS_Store

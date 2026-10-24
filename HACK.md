@@ -48,14 +48,18 @@ table verdict {
   reasons: string[]         // from rule engine; exact format TBD with Sophia
   explanation_en: string    // Claude
   explanation_zh: string    // Claude
-  created_at: Timestamp
+  created_at: Timestamp     // set inside the reducer from ctx.timestamp, not passed by caller
 }
 reducer report_verdict(...)  // called by Sophia's pipeline
+  // reject callers whose identity isn't the analysis service's (token from POST /v1/identity),
+  // otherwise anyone who knows the DB name can insert fake verdicts
 ```
 
 ## Cut list
 Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm or push back.
-- PROPOSED: Native Android share sheet. A native Android app is too much for 2 people. Web upload instead; PWA share_target is a stretch goal.
+- PROPOSED: Native Android share sheet. A native Android app is too much for 2 people. Web upload instead; PWA share_target is a stretch goal
+  (Android Chrome only; app must be installed first, which needs HTTPS, so a tunnel or deployed host;
+  manifest share_target uses POST + multipart/form-data with a files entry accepting .apk).
 - PROPOSED: Link input. Analyzing a link means downloading a live scam APK. Stretch goal: domain-only checks on a pasted link.
 - Login/accounts: a pairing code is the only identity
 - Remote blocking by the relative: alerts are view-only by design
@@ -66,7 +70,10 @@ Items marked PROPOSED are Anthony's suggestions, not agreed yet. Sophia: confirm
 - SpacetimeDB (`spacetime dev --template react-ts`): realtime sync with no custom backend
 - Detection: <Sophia's choice, e.g. Python + androguard>
 - Claude API (Haiku), server-side only, key in `.env`, never in the client
-- Riskiest integration: Sophia's pipeline calling `report_verdict` (SDK or HTTP API). Spike result: pending.
+- Riskiest integration: Sophia's pipeline calling `report_verdict`. No Python SDK exists, so either
+  HTTP API `POST /v1/database/<db>/call/report_verdict` (JSON array of args, Bearer token) or a
+  small Node script using the TS SDK. Spike result: pending.
+- Analysis service: set an upload size limit (APKs can be tens of MB).
 
 Architecture:
 ```
@@ -83,6 +90,8 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 - Test APKs may be self-built "scam-pattern" samples, not real malware. Say which.
 - Small sample set, so precision/recall numbers are indicative only
 - Claude may mistranslate urgency or soften a warning (known failure mode)
+- Verdict table is public so relatives can subscribe; anyone with the DB name could read all
+  sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
 ## Pitch
 - One-liner: <Product> helps Chinese-American elders and their families catch sideloaded scam apps by explaining real static-analysis red flags in plain EN/中文 and alerting family instantly.
@@ -90,3 +99,6 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 
 ## Status log
 - 20:00 Fri Anthony: Wrote plan from Sophia's doc. PROPOSED cuts: share sheet, link input; graph as stretch. NEXT: Sophia reviews the cuts + verdict contract, then spike pipeline → report_verdict → family view.
+- 20:30 Fri Anthony: PROPOSED process: plan-reviewer subagent cross-checks every commit and plan
+  change (rule in CLAUDE.md). Sophia: OK with this? Also folded in reviewer fixes: HTTP reducer path,
+  reducer identity check, PWA limits, public-table limitation.

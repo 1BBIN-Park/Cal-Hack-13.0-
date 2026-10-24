@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSpacetimeDB } from 'spacetimedb/react';
 import { navigate, useLocation } from './router';
+import { CANT_CONNECT, useSlowToLoad } from './useSlowToLoad';
 import { clearPairing, isValidCode, loadPairing, normalizeCode } from './session';
 import { Pairing } from './screens/Pairing';
 import { Scan } from './screens/Scan';
@@ -8,6 +9,8 @@ import { Family } from './screens/Family';
 
 function App() {
   const { isActive: connected } = useSpacetimeDB();
+  // One offline signal for every screen, including drops mid-session.
+  const slow = useSlowToLoad(connected);
   const { path, params } = useLocation();
   const session = normalizeCode(params.get('session') ?? '');
 
@@ -20,24 +23,28 @@ function App() {
     }
   }, [path]);
 
+  const pairedRoute = path === '/elder' || path === '/family';
+  const paired = pairedRoute && isValidCode(session);
+
   let screen;
-  if ((path === '/elder' || path === '/family') && isValidCode(session)) {
+  if (paired) {
     // key: a new session starts with fresh state (no stale "waiting" or NEW marks).
     screen =
       path === '/elder' ? <Scan key={session} session={session} /> : <Family key={session} session={session} />;
   } else {
-    screen = <Pairing />;
+    // A bad or missing code in a shared link: say so instead of silently resetting.
+    screen = <Pairing invalidLink={pairedRoute} />;
   }
 
   return (
     <>
       {!connected && (
-        <div className="offline" role="status">
-          正在连接… · Connecting to server…
+        <div className={slow ? 'offline offline--down' : 'offline'} role="status">
+          {slow ? CANT_CONNECT : '正在连接… · Connecting to server…'}
         </div>
       )}
       {screen}
-      {path !== '/' && (
+      {paired && (
         <button
           className="btn btn--link unpair"
           onClick={() => {

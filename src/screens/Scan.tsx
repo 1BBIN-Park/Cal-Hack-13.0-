@@ -36,8 +36,13 @@ export function Scan({ session }: { session: string }) {
   // A verdict that wasn't there when we uploaded is this upload's result.
   const fresh =
     status.kind === 'waiting' ? verdicts.find(v => !status.knownIds.has(v.id)) : undefined;
+  const resultRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (fresh) setStatus({ kind: 'idle' });
+    if (!fresh) return;
+    setStatus({ kind: 'idle' });
+    // On a phone the result can land below the fold; bring it into view.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    resultRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }, [fresh]);
 
   // If the pipeline never reports, don't leave the elder stuck on a spinner.
@@ -123,12 +128,16 @@ export function Scan({ session }: { session: string }) {
         }}
       >
         <label htmlFor="link">或粘贴链接 · Or paste a link</label>
+        <p className="hint link-hint" id="link-hint">
+          可以粘贴整条短信 · Pasting the whole message is OK
+        </p>
         <input
           id="link"
           className="link-input"
           type="text"
           inputMode="url"
-          placeholder="https://… (可以粘贴整条短信 · whole message is OK)"
+          aria-describedby="link-hint"
+          placeholder="https://…"
           value={link}
           onChange={e => setLink(e.target.value)}
           autoComplete="off"
@@ -153,14 +162,14 @@ export function Scan({ session }: { session: string }) {
         </p>
       )}
 
-      <section aria-live="polite">
+      <section aria-live="polite" ref={resultRef} className="result">
         {!ready ? null : latest ? (
           <>
             <h2>{sending ? '上次检查 · Last check' : '检查结果 · Result'}</h2>
             <VerdictCard verdict={latest} large />
           </>
         ) : (
-          <p className="empty">还没有检查记录 · No checks yet</p>
+          !sending && <p className="empty">还没有检查记录 · No checks yet</p>
         )}
       </section>
     </main>

@@ -21,9 +21,16 @@ export function Family({ session }: { session: string }) {
       <p className="session-tag">Paired with code {session}</p>
       <h1>Family alerts · 家人提醒</h1>
       {!ready ? (
-        <p className="empty">Connecting…</p>
+        <p className="empty">Loading… · 加载中…</p>
       ) : verdicts.length === 0 ? (
-        <p className="empty">No alerts yet · 暂无警报</p>
+        <div className="empty-state">
+          <p className="empty-state__title">No alerts yet · 暂无警报</p>
+          <p className="hint">
+            When your family member checks an app, the result shows up here instantly.
+            <br />
+            家人检查应用后，结果会立刻显示在这里。
+          </p>
+        </div>
       ) : (
         <ul className="feed">
           {verdicts.map(v => (

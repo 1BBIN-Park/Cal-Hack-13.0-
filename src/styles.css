@@ -151,6 +151,41 @@ form {
 .link-form label {
   color: var(--muted);
 }
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.hero__title {
+  font-size: 1.8rem;
+  line-height: 1.2;
+  margin: 8px 0 0;
+}
+.hero__title span {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.empty-state {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+}
+.empty-state__title {
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.result {
+  scroll-margin-top: 16px;
+}
+.link-hint {
+  font-size: 0.85rem;
+  margin-top: -6px;
+}
 .link-preview {
   overflow-wrap: anywhere;
 }
@@ -184,64 +219,111 @@ form {
 }
 .error {
   color: var(--high);
+  background: var(--high-bg);
+  border-radius: 12px;
+  padding: 12px 16px;
   margin: 0;
 }
 
+/* Card is neutral; the risk color is the one accent (border + risk pill). */
 .verdict {
+  --risk: var(--muted);
+  --risk-bg: var(--bg);
   background: var(--surface);
-  border: 2px solid var(--border);
-  border-left-width: 8px;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--risk);
+  border-radius: 16px;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .verdict--high {
-  border-color: var(--high);
-  background: var(--high-bg);
+  --risk: var(--high);
+  --risk-bg: var(--high-bg);
 }
 .verdict--medium {
-  border-color: var(--medium);
-  background: var(--medium-bg);
+  --risk: var(--medium);
+  --risk-bg: var(--medium-bg);
 }
 .verdict--low {
-  border-color: var(--low);
-  background: var(--low-bg);
+  --risk: var(--low);
+  --risk-bg: var(--low-bg);
 }
-.verdict--large .verdict__text {
-  font-size: 1.15rem;
-}
-.verdict__header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  align-items: baseline;
-}
-.verdict__badge {
+.verdict__risk {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 12px 4px 6px;
+  border-radius: 999px;
+  background: var(--risk-bg);
+  color: var(--risk);
   font-weight: 700;
 }
-.verdict--high .verdict__badge {
-  color: var(--high);
-}
-.verdict--medium .verdict__badge {
-  color: var(--medium);
-}
-.verdict--low .verdict__badge {
-  color: var(--low);
+.verdict__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--risk);
+  color: var(--surface);
+  font-size: 0.8rem;
 }
 .verdict__app {
-  color: var(--muted);
+  margin: 0;
+  font-size: 1.05rem;
   overflow-wrap: anywhere;
 }
-.verdict__text {
-  margin: 8px 0;
+.verdict__source {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
 }
-.verdict__reasons ul {
-  margin: 8px 0 0;
+.verdict__ai,
+.verdict__facts {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.verdict__text {
+  margin: 4px 0;
+}
+.verdict__facts ul {
+  margin: 0;
   padding-left: 1.2em;
+  list-style: disc;
 }
 .verdict__time {
   color: var(--muted);
   font-size: 0.8rem;
-  margin-top: 8px;
+}
+
+/* Elder banner: bigger and the warning reads first. */
+.verdict--high.verdict--large {
+  background: var(--high-bg);
+}
+.verdict--high.verdict--large .verdict__risk {
+  background: var(--surface);
+}
+.verdict--large .verdict__risk {
+  font-size: 1.2rem;
+  padding: 6px 16px 6px 8px;
+}
+.verdict--large .verdict__icon {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+}
+.verdict--large .verdict__text[lang='zh'] {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.verdict--large .verdict__text[lang='en'] {
+  font-size: 1.05rem;
 }
 
 .feed {
@@ -276,6 +358,11 @@ form {
   color: var(--medium);
   text-align: center;
   padding: 8px 16px;
+}
+.offline--down {
+  background: var(--high-bg);
+  color: var(--high);
+  font-weight: 600;
 }
 .unpair {
   display: block;

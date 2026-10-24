@@ -3,7 +3,7 @@ import { isValidCode, newPairingCode, normalizeCode, savePairing } from '../sess
 import { navigate } from '../router';
 
 // Screen B: both devices. The elder's device makes a code; the relative types it in.
-export function Pairing() {
+export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
   const [mode, setMode] = useState<'choose' | 'elder' | 'family'>('choose');
   const [code] = useState(newPairingCode);
   const [input, setInput] = useState('');
@@ -72,7 +72,22 @@ export function Pairing() {
 
   return (
     <main className="screen">
-      <h1>应用安全检查 · Scam App Check</h1>
+      <header className="hero">
+        <h1 className="hero__title">
+          应用安全检查
+          <span>Scam App Check</span>
+        </h1>
+        <p className="hint">
+          收到陌生的投资应用或链接？先检查一下，家人也能看到结果。
+          <br />
+          Got an unfamiliar investment app or link? Check it first, and your family sees the result too.
+        </p>
+      </header>
+      {invalidLink && (
+        <p className="error" role="alert">
+          这个链接里的配对码无效，请重新配对。 · The pairing code in this link isn’t valid. Please pair again.
+        </p>
+      )}
       <button className="btn btn--primary btn--big" onClick={() => setMode('elder')}>
         我要检查应用
         <small>I want to check an app</small>

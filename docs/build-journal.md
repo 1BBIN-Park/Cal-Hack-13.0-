@@ -195,8 +195,8 @@ or a recorded test shows; anything not live yet is marked.
 
 ### Sat ~14:40: Known false positive: benign BMI calculator scores "medium" (quality, honesty)
 - **What:** In Sophia's scored output (`py/analysis_output/scored_results.json`, commit 5d82863),
-  the benign BMI calculator comparison app (`com.github.characterdog.bmicalculator`; that it's
-  open-source is unconfirmed, Sophia to say) scores
+  the benign BMI calculator comparison app (`com.github.characterdog.bmicalculator`, an open-source F-Droid
+  app per Sophia) scores
   `medium` (score 3), driven by the WebView-shell flag plus hardcoded URLs (Play Store, Crowdin,
   GitHub). The notes app scores `low`; the synthetic scam sample scores `high` (7).
 - **Status:** known false positive; to be disclosed together with the accuracy numbers.

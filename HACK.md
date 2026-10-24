@@ -136,3 +136,14 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 - 20:45 Fri Anthony: Android share-target app is back in scope as Phase 2 (timeboxed, web upload
   stays as fallback). Added Locked decisions, change notes, and edit-protection settings. Sophia:
   review the PENDING rows.
+- 21:15 Fri Anthony: My "Anthony's Task Breakdown" doc differs from this plan in 4 places. Sophia, weigh in:
+  1. Scan screen takes "a link or file". Link input is a PROPOSED cut; Anthony thinks Sophia may
+     have a low-risk way to do it (e.g. domain-only checks, no APK download). Sophia: describe it
+     and we'll un-cut it if safe. Until then the Scan screen does file upload only.
+  2. "Share-target entry point": PWA share target is cut; web gets an upload button, share target
+     moves to the Phase 2 Android app (pending Sophia).
+  3. ~10 hrs for static screens is too long for a web loop by Sat ~10 AM; screens stay quick.
+  4. No report_verdict spike or hosting in the breakdown. Plan calls the spike the riskiest piece
+     and says to test hosting tonight, so both go first.
+  NEXT: scaffold `spacetimedb/` (CLI installing) with verdict table as DRAFT, report_verdict spike
+  + hosting check, then 3 static screens.

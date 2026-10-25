@@ -334,3 +334,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   TESTED: APK upload from the app (the MVP "done means" names APK upload; decide with Sophia:
   test her synthetic APK from a phone, or demo the link path). Android app: no Android phone,
   so it's pitched as next, not built. Claude's "safe" overclaim added to README + Devpost.
+- 19:30 Sat Anthony: DEMO = LINK PATH (Anthony proposed; Sophia agreed, Slack ~19:20, relayed).
+  The MVP "done means" names APK upload; APK upload from the app stays untested and is disclosed.
+  Sophia's real story is in the Devpost Inspiration. Sophia fixed the prompt (never "safe"/"安全";
+  unreachable = "couldn't check where it leads"), NOT pushed yet: update README/Devpost once it
+  is. Also today: family Clear + Undo (hides only, e831651), "Bank blue" palette (057c4e9),
+  PITCH.md (2-min script, roles PROPOSED, Q&A). NEXT: dry-run the unedited Fidelity SMS on both
+  phones, upload the latest build, make the repo public, submit Devpost, record the backup video.

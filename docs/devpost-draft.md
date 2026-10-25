@@ -24,8 +24,13 @@ Center in 2024, up 43% from 2023 and the most of any age group; investment fraud
 platforms and trading apps. A growing number of these cases are "pig butchering": scammers build
 trust online or through messaging apps, then steer victims to fake crypto investments
 ([InvestmentNews, Apr 2025](https://www.investmentnews.com/ria-news/elder-fraud-complaints-surge-past-48-billion-as-investment-scams-lead-losses/260273), citing the FBI's 2024 Internet Crime Report).
-[Sophia owns this section. Still needed: our real story, someone we know or talked to. The
-Anthropic track asks for a problem "you lived or heard from someone".]
+This problem is personal for us. A friend of Sophia's mother, in China, spent a month messaging
+someone claiming to be a U.S. serviceman online before he asked her to wire money. This pattern,
+often run out of scam compounds in Myanmar, has drawn global attention. Sophia has seen news
+coverage of elderly victims being stopped by police at bank counters mid-transfer, and she got a
+scam call herself the day she wrote this. Her mother now sends her every suspicious link or app
+before clicking. Most people her generation don't have that safety net. SecondLook tries to
+give them one. [Sophia: OK this edit of your story]
 
 ## What it does
 - **Pair two phones** with a 6-character code: the elder's phone and a family member's. No accounts.

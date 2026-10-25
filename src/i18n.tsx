@@ -57,6 +57,8 @@ const STRINGS = {
     en: 'When your family member checks an app or link, the result shows up here instantly.',
   },
   newBadge: { zh: '新', en: 'NEW' },
+  clearAlerts: { zh: '清除这些提醒（只在本机）', en: 'Clear these alerts (this phone only)' },
+  undoClear: { zh: '撤销清除', en: 'Undo clear' },
   highRisk: { zh: '高风险', en: 'High risk' },
   mediumRisk: { zh: '中等风险', en: 'Medium risk' },
   // Links get a domain-only check, so "low" must not read as "safe".

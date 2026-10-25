@@ -413,6 +413,11 @@ form {
     transform: translateY(-12px) scale(0.98);
   }
 }
+.clear-btn {
+  align-self: center;
+  font-size: 0.95rem;
+  min-height: 48px;
+}
 .new-pill {
   display: inline-block;
   background: var(--high);

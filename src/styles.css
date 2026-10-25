@@ -1,15 +1,15 @@
 :root {
-  --bg: #f6f3ec;
-  --bg-glow: #dff0ec;
+  --bg: #f4f5f7;
   --surface: #ffffff;
-  --text: #17201f;
-  --muted: #55605e;
-  --border: #dcd6ca;
-  --primary: #0f6b63;
+  --text: #141a24;
+  --muted: #4f5868;
+  --border: #d6dbe3;
+  --primary: #1f4e99;
   --primary-text: #ffffff;
-  --brand-a: #0f6b63;
-  --brand-b: #168a80;
-  --shadow: 0 1px 2px rgba(20, 30, 28, 0.06), 0 8px 24px rgba(20, 30, 28, 0.08);
+  --brand-a: #1f4e99;
+  --brand-b: #3a6cc0;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.08);
+  --btn-shadow: 0 4px 12px rgba(16, 24, 40, 0.16);
   --high: #b3261e;
   --high-bg: #fdecea;
   --medium: #8a5a00;
@@ -25,17 +25,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1514;
-    --bg-glow: #123430;
-    --surface: #18211f;
-    --text: #eef3f2;
-    --muted: #a9b6b3;
-    --border: #2c3a38;
-    --primary: #5fd0c2;
-    --primary-text: #052a26;
-    --brand-a: #2aa198;
-    --brand-b: #5fd0c2;
+    --bg: #0e131b;
+    --surface: #171e29;
+    --text: #edf1f6;
+    --muted: #a7b1c0;
+    --border: #2b3546;
+    --primary: #8fb4ff;
+    --primary-text: #0b1b38;
+    --brand-a: #4f7fd6;
+    --brand-b: #8fb4ff;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --btn-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     --high: #ff8a80;
     --high-bg: #3b1714;
     --medium: #ffcc66;
@@ -51,8 +51,7 @@
 
 body {
   margin: 0;
-  background: radial-gradient(900px 420px at 50% -140px, var(--bg-glow), transparent) no-repeat,
-    var(--bg);
+  background: var(--bg);
   min-height: 100vh;
 }
 
@@ -123,7 +122,7 @@ h2 {
 .btn--primary {
   background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
   color: var(--primary-text);
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-a) 35%, transparent);
+  box-shadow: var(--btn-shadow);
 }
 .btn--secondary {
   background: var(--surface);
@@ -486,7 +485,7 @@ form {
 .logo {
   flex: none;
   border-radius: 14px;
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-a) 30%, transparent);
+  box-shadow: var(--btn-shadow);
 }
 .hero .logo {
   margin-top: 8px;

@@ -9,7 +9,8 @@ Status markers in [brackets] are notes to us; remove them before submitting. Any
 warning live. Rules decide the risk; Claude explains it in 中文 and English.
 
 **Tracks:** Anthropic · Spacetime · Best People-First Hack · Best Security Hack (Armadin) · Best
-Beginner Hack · Best Use of Gen AI (MLH) [+ Meta "Bringing People Closer Together with AI": Sophia
+Beginner Hack · Best Use of Gen AI (MLH) · Best Domain Name from GoDaddy Registry (2ndlook.us)
+[Sophia: OK?] [+ Meta "Bringing People Closer Together with AI": Sophia
 to decide]
 
 ---
@@ -132,5 +133,5 @@ Claude Code
 - Small sample set, so accuracy numbers are indicative only.
 - Rule reasons are English-only for now; Claude's explanation comes in both languages.
 
-**Links:** repo [make public before submitting] · live site https://scam-app-check.netlify.app ·
+**Links:** repo [make public before submitting] · live site https://2ndlook.us (backup https://scam-app-check.netlify.app) ·
 demo video [TBD]

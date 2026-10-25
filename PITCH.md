@@ -10,6 +10,8 @@ Both of us at the table.
 
 **Before judges arrive**
 - Sophia's service running; laptop on the phone hotspot, not venue Wi-Fi.
+- Use https://2ndlook.us and pair both phones there (pairings don't carry over from the
+  Netlify address; if you fall back to it, re-pair there).
 - Elder phone in 中文, family phone in English, both paired with a fresh code (never TEST01,
   ZZZZZZ, WJDXYY). Family phone unlocked on the family screen, brightness up, notifications off.
 - This exact SMS (Sophia's real example, unedited) copied on the elder phone:

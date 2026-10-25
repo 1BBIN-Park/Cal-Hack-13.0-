@@ -11,7 +11,7 @@ the verdict in plain Chinese and English, and a **paired family member** sees th
 live on their own phone. For links, the whole loop is live and tested on two real phones;
 uploading an APK from the app is not tested yet (see [Status](#status)).
 
-- Live demo site: https://scam-app-check.netlify.app (needs the analysis service running; see
+- Live demo site: https://2ndlook.us (backup: https://scam-app-check.netlify.app; needs the analysis service running; see
   [Status](#status))
 - Build notes and the bugs we caught along the way: [`docs/build-journal.md`](docs/build-journal.md)
 

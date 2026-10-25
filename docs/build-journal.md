@@ -54,7 +54,7 @@ or a recorded test shows; anything not live yet is marked.
   both phones before judging): paste the scam SMS on the elder phone;
   after the analysis, the family phone in the judge's hand updates at the same moment the elder's
   does. "Both phones read it from the same SpacetimeDB subscription. No server of ours relays it."
-- Permanent demo site: https://scam-app-check.netlify.app (locked demo DB on Maincloud).
+- Permanent demo site: https://2ndlook.us (backup https://scam-app-check.netlify.app; locked demo DB on Maincloud).
 
 **Technical complexity / quality / security**
 - Link extraction handles real phishing tricks: Cyrillic look-alikes, `bank.com@evil.top`,

@@ -16,7 +16,7 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
       <main className="screen">
         <h1>{t('yourCode')}</h1>
         <p className="hint">{t('giveCode')}</p>
-        <p className="code" aria-label={`${t('pairingCodeIs')} ${code.split('').join(' ')}`}>
+        <p className="code" role="img" aria-label={`${t('pairingCodeIs')} ${code.split('').join(' ')}`}>
           {code}
         </p>
         <button

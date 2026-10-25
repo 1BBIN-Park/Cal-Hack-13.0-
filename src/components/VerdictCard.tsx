@@ -5,8 +5,32 @@ import { useLang, type Lang, type StringKey } from '../i18n';
 const RISK: Record<string, { key: StringKey; icon: string }> = {
   high: { key: 'highRisk', icon: '⚠︎' }, // text style, not the color emoji
   medium: { key: 'mediumRisk', icon: '!' },
-  low: { key: 'lowRisk', icon: '✓' },
+  low: { key: 'lowRisk', icon: 'i' }, // not ✓: a domain-only check isn't "safe"
 };
+
+// Fixed "what to do" text by risk level, for the elder's card and the family's.
+const NEXT: Record<string, { elder: StringKey; family: StringKey }> = {
+  high: { elder: 'nextHighElder', family: 'nextHighFamily' },
+  medium: { elder: 'nextMediumElder', family: 'nextMediumFamily' },
+  low: { elder: 'nextLowElder', family: 'nextLowFamily' },
+};
+
+// The service's canned text when the Claude call fails. It isn't Claude's
+// writing, so it must not appear under the Claude label (HACK.md locked decision).
+// Sophia's new fallback (Sat ~18:15) starts "Automatic message:"; the older
+// wording is kept so old verdicts stay hidden. EN and ZH are written together,
+// so a canned EN text means the ZH one is canned too: no need to know its prefix.
+const CANNED = /^[[【(（]?\s*(Automatic message|We couldn't generate|我们暂时无法生成)/i;
+
+// A link verdict's app_name is the URL: title it by host, show the full URL small.
+function splitUrl(name: string): { title: string; url?: string } {
+  if (!/^https?:\/\//i.test(name)) return { title: name };
+  try {
+    return { title: new URL(name).hostname, url: name };
+  } catch {
+    return { title: name };
+  }
+}
 
 // Re-render periodically so "2 min ago" stays true.
 function useNow(intervalMs: number) {
@@ -42,7 +66,11 @@ export function VerdictCard({ verdict, large = false }: { verdict: Verdict; larg
   const now = useNow(30_000);
   const risk = RISK[verdict.riskLevel];
   const when = verdict.timestamp.toDate();
-  const explanation = lang === 'zh' ? verdict.explanationZh : verdict.explanationEn;
+  const explanation = (lang === 'zh' ? verdict.explanationZh : verdict.explanationEn).trim();
+  const canned = CANNED.test(verdict.explanationEn.trim()) || CANNED.test(verdict.explanationZh.trim());
+  const fromClaude = explanation !== '' && !canned;
+  const next = NEXT[verdict.riskLevel];
+  const { title, url } = splitUrl(verdict.appName);
 
   return (
     <article className={`verdict verdict--${verdict.riskLevel}${large ? ' verdict--large' : ''}`}>
@@ -52,14 +80,24 @@ export function VerdictCard({ verdict, large = false }: { verdict: Verdict; larg
         </span>
         {risk ? t(risk.key) : verdict.riskLevel}
       </p>
-      <h2 className="verdict__app">{verdict.appName}</h2>
+      <h2 className="verdict__app">{title}</h2>
+      {url && <p className="verdict__url">{url}</p>}
 
-      <section className="verdict__ai" aria-label={t('aiExplanation')}>
-        <p className="verdict__source">{t('aiExplanation')}</p>
-        <p className="verdict__text" lang={lang === 'zh' ? 'zh-CN' : 'en'}>
-          {explanation}
-        </p>
-      </section>
+      {next && (
+        <section className="verdict__next" aria-label={t('nextStep')}>
+          <p className="verdict__source">{t('nextStep')}</p>
+          <p className="verdict__step">{t(large ? next.elder : next.family)}</p>
+        </section>
+      )}
+
+      {fromClaude && (
+        <section className="verdict__ai" aria-label={t('aiExplanation')}>
+          <p className="verdict__source">{t('aiExplanation')}</p>
+          <p className="verdict__text" lang={lang === 'zh' ? 'zh-CN' : 'en'}>
+            {explanation}
+          </p>
+        </section>
+      )}
 
       {verdict.reasons.length > 0 && (
         <section className="verdict__facts" aria-label={t('foundByRules')}>

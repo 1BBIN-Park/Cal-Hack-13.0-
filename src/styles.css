@@ -76,6 +76,18 @@ h2 {
 .session-tag {
   font-size: 0.85rem;
 }
+.pair-code {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pair-code__value {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text);
+}
 
 .btn {
   font: inherit;
@@ -276,6 +288,20 @@ form {
   letter-spacing: 0.02em;
   color: var(--muted);
 }
+.verdict__url {
+  margin: -6px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.verdict__step {
+  margin: 4px 0;
+  font-weight: 600;
+}
+.verdict--large .verdict__step {
+  font-size: 1.15rem;
+}
+.verdict__next,
 .verdict__ai,
 .verdict__facts {
   border-top: 1px solid var(--border);

@@ -30,8 +30,8 @@ const STRINGS = {
     zh: '无法连接服务器，请检查网络。',
     en: 'Can’t reach the server. Check your internet connection.',
   },
-  code: { zh: '配对码', en: 'Code' },
-  checkAnApp: { zh: '检查应用', en: 'Check an app' },
+  codeForFamily: { zh: '配对码（给家人看）', en: 'Pairing code (show your family)' },
+  checkAnApp: { zh: '检查应用或链接', en: 'Check an app or link' },
   chooseApk: { zh: '选择安装包 (APK)', en: 'Choose an APK file' },
   orPasteLink: { zh: '或粘贴链接', en: 'Or paste a link' },
   wholeMessageOk: { zh: '可以粘贴整条短信', en: 'Pasting the whole message is OK' },
@@ -43,22 +43,53 @@ const STRINGS = {
   lastCheck: { zh: '上次检查', en: 'Last check' },
   noChecks: { zh: '还没有检查记录', en: 'No checks yet' },
   noResult: { zh: '还没有结果，请再试一次。', en: 'No result yet, please try again.' },
-  notConnected: { zh: '分析服务未连接。', en: 'Analysis service not connected (VITE_ANALYSIS_URL unset).' },
-  sendFailed: { zh: '发送失败：', en: 'Send failed:' },
+  notConnected: { zh: '暂时无法检查，请先问问家人。', en: 'Checking isn’t available right now. Ask your family first.' },
+  sendFailed: {
+    zh: '暂时无法检查，请稍后再试，或先问问家人。',
+    en: 'Couldn’t check right now. Try again in a minute, or ask your family first.',
+  },
   pairedWith: { zh: '已配对，配对码', en: 'Paired with code' },
   familyAlerts: { zh: '家人提醒', en: 'Family alerts' },
   loading: { zh: '加载中…', en: 'Loading…' },
   noAlerts: { zh: '暂无警报', en: 'No alerts yet' },
   noAlertsHint: {
-    zh: '家人检查应用后，结果会立刻显示在这里。',
-    en: 'When your family member checks an app, the result shows up here instantly.',
+    zh: '家人检查应用或链接后，结果会立刻显示在这里。',
+    en: 'When your family member checks an app or link, the result shows up here instantly.',
   },
   newBadge: { zh: '新', en: 'NEW' },
   highRisk: { zh: '高风险', en: 'High risk' },
   mediumRisk: { zh: '中等风险', en: 'Medium risk' },
-  lowRisk: { zh: '低风险', en: 'Low risk' },
+  // Links get a domain-only check, so "low" must not read as "safe".
+  lowRisk: { zh: '未发现明显风险', en: 'No warning signs found' },
   aiExplanation: { zh: 'AI 解释（Claude）', en: 'AI explanation (Claude)' },
   foundByRules: { zh: '规则检测（英文）', en: 'Found by rules' },
+  // "What to do" is fixed text picked by risk level (never Claude's), one set
+  // for the elder's own card and one for the family's.
+  nextStep: { zh: '下一步', en: 'What to do' },
+  nextHighElder: {
+    zh: '不要点击链接，也不要安装。先给家人打个电话。',
+    en: 'Don’t tap the link or install anything. Call your family first.',
+  },
+  nextHighFamily: {
+    zh: '请马上给家人打电话，提醒他们不要点击或安装。',
+    en: 'Call them now, before they tap or install anything.',
+  },
+  nextMediumElder: {
+    zh: '先别点击或安装，问问家人。',
+    en: 'Don’t tap or install anything yet. Ask your family first.',
+  },
+  nextMediumFamily: {
+    zh: '在他们点击或安装之前，和他们聊一聊。',
+    en: 'Check in with them before they tap or install anything.',
+  },
+  nextLowElder: {
+    zh: '这不代表一定安全。如果有人催您付款或安装，先问问家人。',
+    en: 'This doesn’t guarantee it’s safe. If anyone rushes you to pay or install, ask your family first.',
+  },
+  nextLowFamily: {
+    zh: '这不代表一定安全。如果他们被催着付款或安装，问一问他们。',
+    en: 'This doesn’t guarantee it’s safe. If they were rushed to pay or install, check in with them.',
+  },
   switchTo: { zh: 'English', en: '中文' },
 } satisfies Record<string, Record<Lang, string>>;
 

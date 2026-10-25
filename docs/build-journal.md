@@ -20,7 +20,10 @@ or a recorded test shows; anything not live yet is marked.
 **Anthropic**
 - Named community: Chinese-American elderly immigrants and their adult children.
 - Rules decide the risk, Claude only explains it, and every verdict card says which part is
-  which ("AI explanation (Claude)" vs "Found by rules"). Built and visible in the UI.
+  which ("AI explanation (Claude)" vs "Found by rules"). Built and visible in the UI. Since Sat
+  18:05 the Claude label is hidden over empty text and the service's known fallback text (a prefix
+  match; Sophia keeps those prefixes stable), and the
+  "What to do" step is fixed text chosen by the rules' risk level, so Claude can't soften it.
 - Where Claude could go wrong is written down (HACK.md Honesty): mistranslated urgency, softened
   warnings. The pasted SMS going to Claude is disclosed too.
 - Found Sat ~14:30: Sophia's pipeline (rules + Claude Haiku) had written one real verdict to the demo DB:
@@ -61,6 +64,10 @@ or a recorded test shows; anything not live yet is marked.
 - Integration review of the analysis service before the first live loop found a dropped SMS
   field, upload path traversal, `debug=True` on a public URL, and link bodies being downloaded
   (against a locked safety decision). Fix pending (Sophia).
+- Elder-first copy (People-First): a `ux-critic` agent checks screens at phone width in 中文/EN;
+  its first pass led to a "下一步 / What to do" line, the real hostname as the title, calm errors in
+  the phone's language, and low risk worded as "No warning signs found" with "This doesn't guarantee it's safe". Checked
+  in headless Chrome; not yet on real phones.
 - Known false positive, to disclose with accuracy numbers: a benign BMI calculator scores
   `medium` (WebView-shell flag).
 
@@ -201,3 +208,33 @@ or a recorded test shows; anything not live yet is marked.
   GitHub). The notes app scores `low`; the synthetic scam sample scores `high` (7).
 - **Status:** known false positive; to be disclosed together with the accuracy numbers.
 - **Why it matters:** judges will ask about false positives; we can show one we know about.
+
+### Sat 18:05: First UX-critic pass: honest AI label, a "what to do" step, elder-first copy (Anthropic, People-First / quality)
+- **What:** Anthony's session added a `ux-critic` agent (`.claude/agents/ux-critic.md`, commits
+  ce32d28, 5174c2b): a written design contract for elders and their families, plus a live browser
+  pass at 375px wide in 中文 and English, light and dark. It runs only locally (this pass used a
+  throwaway local DB and a local mock service), because every real check writes a verdict that can't be deleted.
+- **Found by:** the ux-critic agent's first pass, confirmed in headless-Chrome screenshots:
+  - the "AI explanation (Claude)" label sat over the service's canned fallback text, or over an
+    empty explanation;
+  - no card told the user what to do next;
+  - English errors ("Failed to fetch") showed on the 中文 phone;
+  - the raw URL was the card title;
+  - the auto-scroll cut off the result heading;
+  - a domain-only check showed a green ✓ "Low risk".
+- **Fix:** commit b9bb240, re-checked in headless Chrome:
+  - the Claude section is hidden over empty text and the service's known fallback text (prefix
+    match);
+  - a fixed "下一步 / What to do" line, picked by the rules' risk level, with separate elder and
+    family wording. It is never Claude's text, so Claude can't soften the advice;
+  - the title is the hostname from the URL parser, so a `user@host` trick shows the real host;
+  - calm error copy in the phone's language;
+  - after the scroll, the heading stays visible (24px from the top);
+  - low risk now reads "未发现明显风险 / No warning signs found" plus "this doesn't guarantee it's safe".
+- **Not tested yet:** on real phones.
+- **Why it matters:** on stage, the fallback text would have been shown as Claude's. Now the AI
+  label is only on Claude's writing, and the advice that matters most comes from the rules.
+- **Pitch line:** "Claude explains, but the 'what to do' line is fixed by the rules' risk level, so
+  no model output can soften it."
+- **Demo moment:** a low-risk link: the card says "No warning signs found" and "this doesn't
+  guarantee it's safe", not a green ✓ "safe".

@@ -76,6 +76,18 @@ h2 {
 .session-tag {
   font-size: 0.85rem;
 }
+.pair-code {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pair-code__value {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text);
+}
 
 .btn {
   font: inherit;

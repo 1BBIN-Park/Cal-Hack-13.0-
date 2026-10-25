@@ -127,9 +127,14 @@ export function Scan({ session }: { session: string }) {
 
   return (
     <main className="screen">
-      <p className="session-tag">
-        {t('code')}: {session}
-      </p>
+      {/* Big enough to read off when the elder holds the phone out to a
+          relative: Continue may have been tapped before the family paired. */}
+      <div className="pair-code">
+        <span className="session-tag">{t('codeForFamily')}</span>
+        <span className="pair-code__value" role="img" aria-label={`${t('pairingCodeIs')} ${session.split('').join(' ')}`}>
+          {session}
+        </span>
+      </div>
       <h1>{t('checkAnApp')}</h1>
 
       <input

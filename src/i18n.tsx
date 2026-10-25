@@ -30,7 +30,7 @@ const STRINGS = {
     zh: '无法连接服务器，请检查网络。',
     en: 'Can’t reach the server. Check your internet connection.',
   },
-  code: { zh: '配对码', en: 'Code' },
+  codeForFamily: { zh: '配对码（给家人看）', en: 'Pairing code (show your family)' },
   checkAnApp: { zh: '检查应用', en: 'Check an app' },
   chooseApk: { zh: '选择安装包 (APK)', en: 'Choose an APK file' },
   orPasteLink: { zh: '或粘贴链接', en: 'Or paste a link' },

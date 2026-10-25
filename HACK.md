@@ -16,7 +16,9 @@
   - Spacetime: SpacetimeDB as the core real-time backend (live shared state, instant sync),
     meaningfully used, not added on the side. Prizes: $2,048 / $1,024 / $512.
   - AGREED (Sophia, Slack Sat ~13:50, relayed): general "Best People-First Hack"; "Best Security
-    Hack" (Armadin, criteria TBA). Beginner: Sophia wants it; check eligibility first.
+    Hack" (Armadin, criteria TBA). Best Beginner Hack: ELIGIBLE (confirmed by Anthony, Sat ~19:00).
+    Best Use of Gen AI (MLH): agreed (Sophia, Slack ~18:15, relayed). Meta "Bringing People Closer
+    Together with AI": Sophia to decide.
   - Both: public GitHub repo required (repo is currently PRIVATE, so make it public before submitting)
 
 ## Team
@@ -140,15 +142,20 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   comparison apps (Sophia, Slack Sat ~13:56, relayed). The benign BMI calculator scores "medium"
   (WebView-shell flag): a known false positive.
 - Small sample set, so precision/recall numbers are indicative only
-- Claude may mistranslate urgency or soften a warning (known failure mode)
+- Claude may mistranslate urgency or soften a warning (known failure mode). SEEN Sat 18:55: on low
+  verdicts it wrote "This link appears to be safe" / "看起来是安全的" (the rules only found no
+  warning signs), and it called an unreachable link "a minor issue". Prompt fix pending (Sophia).
+  Until then, don't demo a low verdict, or present it as the "where Claude goes wrong" moment.
 - report_verdict is locked to the service identity in code (smoke-tested), but the existing test DB
   scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
   publish with the service authorized.
 - Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
 - Demo DB holds test verdicts that can't be deleted (sessions TEST01, ZZZZZZ, WJDXYY). Never use
   those as demo pairing codes.
-- Pasted SMS text is sent to the analysis service and to Claude (Anthropic) for scoring and the
-  explanation. Real messages can contain names, numbers or codes.
+- Pasted SMS text is sent to the analysis service for scoring (urgent wording). Real messages can
+  contain names, numbers or codes. Claude (Anthropic) gets only the rules' findings (risk level and
+  reasons, which can include the link's domain), not the message (py/app.py at 1e9cb25). If that
+  changes, update this line.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
@@ -311,3 +318,19 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   应用或链接". Checked at 375px zh/en, light/dark. Sophia: please send "" when Claude fails, or
   keep the fallback prefixes "We couldn't generate" / "我们暂时无法生成" exactly as they are (the
   UI hides those). NEXT: Anthony deploys the rebuilt bundle → real two-phone test.
+- 18:55 Sat Anthony: Live site serves the latest build (bundle checked: SecondLook, what-to-do,
+  fallback check). Sophia pushed 1e9cb25: claude-haiku-4-5 again; the fallback is now "" (the
+  card hides empty text). Demo DB verdicts 5-7 (session XBU6AP; sender unconfirmed, likely
+  Anthony's phone on the live site, asking him) carry REAL Claude text from her service. If they
+  came from the live site, the deployed loop works: confirm with the two-phone test.
+  CLAUDE OVERCLAIMS: on low verdicts it writes "This link appears to be safe" / "看起来是安全的"
+  (the rules only found no warning signs), and it calls an unreachable link "a minor issue". Sophia: tell Claude never to call anything safe and not to downplay
+  unreachable links. This is our "where Claude goes wrong" story. Multi-parent: one code = one
+  household feed today; following several codes is in Devpost "What's next". Android app: the
+  HACK.md Phase 2 gate (Sat ~6 PM) has passed, so it's pitched as next unless both agree.
+- 19:00 Sat Anthony: TWO-PHONE TEST PASSED (Anthony's report): two real phones paired on the
+  live site (session XBU6AP); the checks (verdicts 5-7, real Claude text) showed on both.
+  Removed the "not live yet" markers in README/Devpost/journal for the link path. Still NOT
+  TESTED: APK upload from the app (the MVP "done means" names APK upload; decide with Sophia:
+  test her synthetic APK from a phone, or demo the link path). Android app: no Android phone,
+  so it's pitched as next, not built. Claude's "safe" overclaim added to README + Devpost.

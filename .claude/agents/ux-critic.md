@@ -57,8 +57,9 @@ Design tokens are on `:root` in `src/styles.css` (light + dark). Copy lives in `
 9. **Every state exists.** First load, offline/reconnecting, invalid code, empty history,
    uploading, waiting for a result, timeout, error and each risk level each have a clear,
    kind screen. No blank flashes, no raw "undefined" and no stack traces.
-10. **Privacy shows.** The pasted SMS is sent to the analysis service and to Claude
-    (disclosed in HACK.md Honesty). The UI shouldn't promise more privacy than that.
+10. **Privacy shows.** The pasted SMS is sent to the analysis service for the rules; Claude
+    sees only the rules' findings (disclosed in HACK.md Honesty). The UI shouldn't promise more
+    privacy than that.
 
 ## How you work: the live pass
 - **Build only for local targets, every time, with the targets spelled out** (the shell or

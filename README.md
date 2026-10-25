@@ -2,7 +2,9 @@
 
 **Cal Hacks 13.0 · Team: Sophia & Anthony**
 
-> **Intentional boundary:** family gets visibility, not control — no interception, no blocking.
+#### Intentional Boundaries
+> Family gets visibility, not control — no interception, no blocking.
+> The rules decide the risk. Claude only explains it.
 
 Chinese-American elderly immigrants get pushed, through text messages and WhatsApp, into
 installing fake crypto-trading apps. They can't tell the app is a scam until the money is gone.

@@ -91,6 +91,8 @@ high-risk verdict.
 ## What's next
 - Android share-sheet app: share a suspicious text or APK straight from WhatsApp/Messages
   (the web side is already ready for it).
+- Both parents covered: today one pairing code is one household feed. Next, a family phone can
+  follow several codes, with each alert labeled ("Mom", "Dad").
 - Vietnamese and Spanish, for communities hit by the same scams (needs Claude explanations in
   those languages).
 - Per-family access control on verdicts; a larger labeled sample set for accuracy numbers.

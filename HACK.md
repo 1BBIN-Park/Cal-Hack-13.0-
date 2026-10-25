@@ -140,7 +140,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   comparison apps (Sophia, Slack Sat ~13:56, relayed). The benign BMI calculator scores "medium"
   (WebView-shell flag): a known false positive.
 - Small sample set, so precision/recall numbers are indicative only
-- Claude may mistranslate urgency or soften a warning (known failure mode)
+- Claude may mistranslate urgency or soften a warning (known failure mode). SEEN Sat 18:55: on low
+  verdicts it wrote "This link appears to be safe" / "看起来是安全的" (the rules only found no
+  warning signs), and it called an unreachable link "a minor issue". Prompt fix pending (Sophia).
+  Until then, don't demo a low verdict, or present it as the "where Claude goes wrong" moment.
 - report_verdict is locked to the service identity in code (smoke-tested), but the existing test DB
   scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
   publish with the service authorized.
@@ -311,3 +314,13 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   应用或链接". Checked at 375px zh/en, light/dark. Sophia: please send "" when Claude fails, or
   keep the fallback prefixes "We couldn't generate" / "我们暂时无法生成" exactly as they are (the
   UI hides those). NEXT: Anthony deploys the rebuilt bundle → real two-phone test.
+- 18:55 Sat Anthony: Live site serves the latest build (bundle checked: SecondLook, what-to-do,
+  fallback check). Sophia pushed 1e9cb25: claude-haiku-4-5 again; the fallback is now "" (the
+  card hides empty text). Demo DB verdicts 5-7 (session XBU6AP; sender unconfirmed, likely
+  Anthony's phone on the live site, asking him) carry REAL Claude text from her service. If they
+  came from the live site, the deployed loop works: confirm with the two-phone test.
+  CLAUDE OVERCLAIMS: on low verdicts it writes "This link appears to be safe" / "看起来是安全的"
+  (the rules only found no warning signs), and it calls an unreachable link "a minor issue". Sophia: tell Claude never to call anything safe and not to downplay
+  unreachable links. This is our "where Claude goes wrong" story. Multi-parent: one code = one
+  household feed today; following several codes is in Devpost "What's next". Android app: the
+  HACK.md Phase 2 gate (Sat ~6 PM) has passed, so it's pitched as next unless both agree.

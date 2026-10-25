@@ -93,8 +93,8 @@ export function Scan({ session }: { session: string }) {
   }
 
   // `message` (optional, agreed with Sophia): the whole pasted text, so her
-  // rules can score the sender, urgency wording and the "reply Y" trick, and
-  // Claude can explain them. Omitted when the paste is just the link.
+  // rules can score the sender, urgency wording and the "reply Y" trick. Claude
+  // sees only the rules' findings, not the message. Omitted when the paste is just the link.
   function checkLink(link: ExtractedLink, pasted: string) {
     const normalized = pasted.normalize('NFKC').replace(/\u3002/g, '.');
     const besidesLink = [link.written, link.written.replace(/^https?:\/\//i, '')]

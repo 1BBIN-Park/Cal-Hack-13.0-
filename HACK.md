@@ -150,8 +150,10 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 - Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
 - Demo DB holds test verdicts that can't be deleted (sessions TEST01, ZZZZZZ, WJDXYY). Never use
   those as demo pairing codes.
-- Pasted SMS text is sent to the analysis service and to Claude (Anthropic) for scoring and the
-  explanation. Real messages can contain names, numbers or codes.
+- Pasted SMS text is sent to the analysis service for scoring (urgent wording). Real messages can
+  contain names, numbers or codes. Claude (Anthropic) gets only the rules' findings (risk level and
+  reasons, which can include the link's domain), not the message (py/app.py at 1e9cb25). If that
+  changes, update this line.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
   sessions' verdicts. Hackathon limitation; production would need per-session access control.
 
@@ -324,3 +326,9 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   unreachable links. This is our "where Claude goes wrong" story. Multi-parent: one code = one
   household feed today; following several codes is in Devpost "What's next". Android app: the
   HACK.md Phase 2 gate (Sat ~6 PM) has passed, so it's pitched as next unless both agree.
+- 19:00 Sat Anthony: TWO-PHONE TEST PASSED (Anthony's report): two real phones paired on the
+  live site (session XBU6AP); the checks (verdicts 5-7, real Claude text) showed on both.
+  Removed the "not live yet" markers in README/Devpost/journal for the link path. Still NOT
+  TESTED: APK upload from the app (the MVP "done means" names APK upload; decide with Sophia:
+  test her synthetic APK from a phone, or demo the link path). Android app: no Android phone,
+  so it's pitched as next, not built. Claude's "safe" overclaim added to README + Devpost.

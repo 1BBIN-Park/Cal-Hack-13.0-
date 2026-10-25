@@ -6,8 +6,7 @@ Status markers in [brackets] are notes to us; remove them before submitting. Any
 **Project name:** SecondLook · 多看一眼
 
 **Tagline:** Check a suspicious app or link before you install or pay, and your family sees the
-warning live. [NOT LIVE YET, add once the loop works: "Rules decide the risk; Claude explains it
-in 中文 and English."]
+warning live. Rules decide the risk; Claude explains it in 中文 and English.
 
 **Tracks:** Anthropic · Spacetime · Best People-First Hack · Best Security Hack [+ Beginner: check we
 qualify first]
@@ -35,22 +34,23 @@ Anthropic track asks for a problem "you lived or heard from someone".]
   full-width text, links broken across lines.
 - **A rules engine decides the risk** from real static-analysis signals: dangerous permissions,
   signing certificate, hardcoded crypto wallet addresses, apps that are just a web page in a
-  wrapper; for links, redirects and the final domain. [NOT LIVE YET: rules engine / service]
+  wrapper; for links, redirects and the final domain. [APK upload from the app: NOT TESTED YET]
 - **Claude explains** the verdict in plain Chinese and English, labeled as AI on every card, next
-  to the rules' actual findings. [NOT LIVE YET: Claude call]
+  to the rules' actual findings.
 - **The family phone gets the same warning live.** View-only by design: elders keep their autonomy.
 
 ## How we built it
 - **SpacetimeDB** is the whole real-time backend. Verdicts are written with one HTTP call to the
   `report_verdict` reducer; every phone paired to a code subscribes to that code's verdicts and
-  updates live (tested with hand-sent verdicts on one real phone and two live subscribers in our
-  smoke test; [NOT LIVE YET: the Python analysis service making that call]). The reducer only accepts the analysis service's identity, which the
+  updates live: the Python analysis service makes that call, and we tested it on two real
+  phones (plus two live subscribers in our smoke test). The reducer only accepts the analysis
+  service's identity, which the
   database owner authorizes at runtime, so no identity sits in our public repo. The SDK handles
   reconnection; we tested it by killing the server mid-session.
 - **React + TypeScript (Vite)** web app: pairing, the elder's check screen, the family feed, a
   中文/English toggle per phone, large text and touch targets for older users.
 - **Python + androguard** static analysis of APKs; APK samples are analyzed, never installed.
-- **Claude Haiku (Anthropic)** writes the explanation from the rules' findings. [NOT LIVE YET]
+- **Claude Haiku (Anthropic)** writes the explanation from the rules' findings.
 - **Process:** we used Claude Code to write and test code; a Claude Code review subagent checked
   Anthony's commits before they landed. It caught several bugs (below). We kept a build journal
   of them.
@@ -88,6 +88,12 @@ can be the difference between stopping and paying. That's why Claude never decid
 rules' findings are shown next to its explanation, so a softened sentence can't hide a
 high-risk verdict.
 
+We saw it happen in testing: for low-risk links, Claude wrote "This link appears to be safe" /
+"看起来是安全的", when the rules had only found no warning signs, and it called a link it couldn't
+reach "a minor issue". A scam site that's been taken down looks exactly like that. So the card's
+"What to do" line is fixed text chosen by the rules, not by Claude, and for low risk it says
+"this doesn't guarantee it's safe". [Update once Sophia's prompt fix lands.]
+
 ## What's next
 - Android share-sheet app: share a suspicious text or APK straight from WhatsApp/Messages
   (the web side is already ready for it).
@@ -103,7 +109,7 @@ Claude Code
 
 ## Disclosures
 - Claude Code was used to help write, test and review code and docs.
-- Test verdicts were sent by hand with `curl` before the pipeline was live [update when live].
+- Early test verdicts were sent by hand with `curl`, before the pipeline was live.
 - Phishing messages from real scam reports (shared by Sophia) were used as text only, never opened.
 - APK samples: one synthetic scam-pattern sample built by our team to show real scam-app
   patterns (WebView-only shell, hardcoded wallet addresses, SMS-reading permission), not live
@@ -111,9 +117,10 @@ Claude Code
   [Notes](https://f-droid.org/en/packages/org.billthefarmer.notes/) and
   [BMI Calculator](https://f-droid.org/en/packages/com.github.characterdog.bmicalculator/).
 - The verdict table is publicly readable (hackathon limitation).
-- Pasted SMS text is sent to our analysis service and to Claude.
+- Pasted SMS text is sent to our analysis service for the rules (urgent wording). Claude gets only
+  the rules' findings (risk level and reasons, which can include the link's domain), not the message.
 - Small sample set, so accuracy numbers are indicative only.
-- Rule reasons are English-only for now; Claude's explanation will come in both languages [NOT LIVE YET].
+- Rule reasons are English-only for now; Claude's explanation comes in both languages.
 
 **Links:** repo [make public before submitting] · live site https://scam-app-check.netlify.app ·
 demo video [TBD]

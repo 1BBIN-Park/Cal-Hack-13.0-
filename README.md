@@ -8,8 +8,8 @@ installing fake crypto-trading apps. They can't tell the app is a scam until the
 SecondLook (多看一眼, "take one more look") lets an elder check a suspicious **app (APK) or link** before installing or paying.
 The design: a **rules engine** decides the risk from static-analysis signals, **Claude** explains
 the verdict in plain Chinese and English, and a **paired family member** sees the same warning
-live on their own phone. The pairing, live sync and screens are built; the rules engine and
-Claude explanation are **not live yet** (see [Status](#status)).
+live on their own phone. For links, the whole loop is live and tested on two real phones;
+uploading an APK from the app is not tested yet (see [Status](#status)).
 
 - Live demo site: https://scam-app-check.netlify.app (needs the analysis service running; see
   [Status](#status))
@@ -23,7 +23,7 @@ Claude explanation are **not live yet** (see [Status](#status)).
  paste a scam SMS / pick an APK  ── HTTPS ──►   static analysis + URL/redirect checks
  link extracted on-device:                      rules engine decides the risk
    look-alike letters, user@host,               Claude writes the 中文 + EN explanation
-   Chinese domains → punycode                   (this box: NOT LIVE YET)
+   Chinese domains → punycode                   (live for links; APK path untested)
                                                            │
                                                            │ report_verdict (HTTP reducer call,
                                                            ▼  only the service's identity allowed)
@@ -42,13 +42,14 @@ Claude explanation are **not live yet** (see [Status](#status)).
 1. **Pair:** the elder's phone makes a 6-character code; the relative types it in. The code is the
    only identity (no accounts).
 2. **Check:** the elder picks an APK, or pastes a link or the whole scam text message.
-3. **Decide** (Sophia's analysis service, not live yet): a rules engine scores signals that
-   [`py/analyze_apk.py`](py/analyze_apk.py) already extracts (permissions, signing-certificate
-   hash, wallet-like strings, a WebView-shell heuristic); for links, the plan is to follow redirects
-   and check the final domain. **Claude never decides the risk**; it only explains the findings.
+3. **Decide** (Sophia's analysis service, [`py/app.py`](py/app.py)): a rules engine scores
+   signals that [`py/analyze_apk.py`](py/analyze_apk.py) extracts (permissions, signing-certificate
+   hash, wallet-like strings, a WebView-shell heuristic); for links, it follows redirects without
+   downloading anything and checks the final domain, look-alike brands and urgent wording.
+   **Claude never decides the risk**; it only explains the findings.
 4. **Alert:** the verdict is written to SpacetimeDB once, and every phone paired to that code gets it
-   through a subscription to the same query (tested with hand-sent verdicts on one real phone and two
-   live subscribers in the smoke test).
+   through a subscription to the same query (tested on two real phones with the live site, and
+   with two live subscribers in the smoke test).
 
 ## SpacetimeDB's role
 
@@ -65,14 +66,19 @@ Module: [`spacetimedb/src/index.ts`](spacetimedb/src/index.ts).
 
 ## Claude's role, and where it could go wrong
 
-Claude (Haiku, per Sophia's plan) will write the explanation for each verdict in Chinese and
-English (not live yet). One language is shown per phone, with a 中文/English toggle. Cards already
+Claude (Haiku) writes the explanation for each verdict in Chinese and English, from the rules'
+findings only. One language is shown per phone, with a 中文/English toggle. Cards already
 label the two halves: "AI explanation (Claude)" vs "Found by rules". Known risks for the people
 using it:
 - Claude may **soften a warning** or **mistranslate urgency**, which matters a lot for elders.
-- The **pasted SMS text is sent** to the analysis service and to Claude. Real messages can contain
-  names, phone numbers or codes.
+- The **pasted SMS text is sent** to our analysis service, which uses it for the rules (urgent
+  wording). Real messages can contain names, phone numbers or codes. Claude gets only the rules'
+  findings (risk level and reasons, which can include the link's domain), not the message.
 - Rule reasons are currently **English only**.
+- **Seen in testing:** on low-risk links Claude wrote "This link appears to be safe" / "看起来是
+  安全的", when the rules only found no warning signs, and it called an unreachable link "a minor
+  issue". A prompt fix is in progress. The card's own "What to do" line is fixed text and says
+  low risk is not a guarantee.
 
 The rules' findings are shown next to Claude's text, and Claude never sets the risk level, so a
 softened sentence can't turn a high-risk verdict into a low one.
@@ -85,11 +91,11 @@ softened sentence can't turn a high-risk verdict into a low one.
 | SpacetimeDB module + identity lock, live on Maincloud | Built, tested |
 | Link extraction (phishing tricks, Chinese domains) | Built, 39 regression cases |
 | Static APK feature extraction ([`py/analyze_apk.py`](py/analyze_apk.py)) | In repo; Sophia reports tested on 3 samples |
-| Analysis service: rules engine + Claude + `report_verdict` ([`py/app.py`](py/app.py)) | In repo; wrote a real verdict to the demo DB; **not yet tested from the app** (Sophia) |
+| Analysis service: rules engine + Claude + `report_verdict` ([`py/app.py`](py/app.py)) | Live for links, tested end to end on two real phones; APK upload from the app **not tested yet** (Sophia) |
 | Android share-target app | Planned (Phase 2) |
 
-Until the analysis service is live, verdicts shown in testing were sent by hand with `curl`,
-except one test verdict written by the service itself.
+Early verdicts in testing were sent by hand with `curl`; since Saturday evening, verdicts come
+from the analysis service.
 
 ## Run it locally
 
@@ -129,7 +135,7 @@ scripts/test-links.sh    # 39 link-extraction cases (strings only, nothing is fe
 
 ## Disclosures
 
-- **AI tools:** Claude (Anthropic) is planned to explain verdicts in the product. We used Claude
+- **AI tools:** Claude (Anthropic) explains verdicts in the product. We used Claude
   Code while building: to write and review code, run tests and draft docs. A Claude Code review
   subagent checked Anthony's commits before they landed.
 - **Libraries/APIs/hosting:** SpacetimeDB (Maincloud), React, Vite, esbuild, TypeScript, Node.js,

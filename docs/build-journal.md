@@ -25,7 +25,8 @@ or a recorded test shows; anything not live yet is marked.
   match; Sophia keeps those prefixes stable), and the
   "What to do" step is fixed text chosen by the rules' risk level, so Claude can't soften it.
 - Where Claude could go wrong is written down (HACK.md Honesty): mistranslated urgency, softened
-  warnings. The pasted SMS going to Claude is disclosed too.
+  warnings. The pasted SMS goes to our service for the rules; Claude only sees the rules'
+  findings. Disclosed.
 - Found Sat ~14:30: Sophia's pipeline (rules + Claude Haiku) had written one real verdict to the demo DB:
   a Fidelity typosquat on `.top`, `high` by the rules, EN/中文 explanation by Claude. The full
   app → service loop is NOT tested yet; the SMS field is dropped until a field-name fix lands.
@@ -47,7 +48,8 @@ or a recorded test shows; anything not live yet is marked.
   ours), and an authenticated caller identity, so write-path auth is a ~10-line check inside the
   reducer instead of an auth service. Reads are public by design (Honesty list). The analysis
   service (Sophia's) is a separate server that writes the verdict.
-- Demo line (not live yet: needs Sophia's hosted service): paste the scam SMS on the elder phone;
+- Demo line (loop tested on two real phones with ordinary links, Sat ~19:00; run the scam SMS on
+  both phones before judging): paste the scam SMS on the elder phone;
   after the analysis, the family phone in the judge's hand updates at the same moment the elder's
   does. "Both phones read it from the same SpacetimeDB subscription. No server of ours relays it."
 - Permanent demo site: https://scam-app-check.netlify.app (locked demo DB on Maincloud).

@@ -1,6 +1,7 @@
 # SecondLook · 多看一眼: pitch
 
-Format (hacker guide): Sun 10:30–12:30 at our table, 2-minute pitch + live demo, then judge Q&A.
+Format (organizers, Sun): at least 3 judges, up to 5 minutes each. Prepare a 3-minute pitch with a
+LIVE demo, and have a demo video STORED LOCALLY on the laptop (required).
 Both of us at the table.
 
 **Roles (agreed, Sat ~19:45)**
@@ -24,17 +25,17 @@ Both of us at the table.
   ```
 - One dry run on both real phones right before judging: high risk and Claude's text appear on
   both. If Claude's section is missing (Claude failed), skip the "written by Claude" line.
-- Backup video open on the laptop.
+- Backup video saved as a local file on the laptop (required), open and ready to play.
 
-## 2-minute script
+## 3-minute script
 
-**Open (15s), Sophia**
+**Open (20s), Sophia**
 "Last year, Americans over 60 reported $7.7 billion in losses to the FBI's Internet Crime
 Complaint Center, up from $4.88 billion the year before. We built this for Chinese-speaking elders who get a
 friendly text, then a link to a fake investment app. SecondLook, 多看一眼, means 'take one more
 look'."
 
-**Demo (70s)**
+**Demo (90s)**
 - Anthony (hands the family phone to the judge): "This is the son's or daughter's phone. It's
   paired with Grandma's phone using a six-letter code. No accounts."
 - Anthony (elder phone, pastes the SMS): "This is a real scam text. Grandma pastes the whole
@@ -51,11 +52,21 @@ look'."
   risk; Claude only explains it."
 - Honesty line, Sophia: "Our scam APK sample is one we built to copy real scam-app patterns,
   and our test set is small."
+- Anthony (elder phone, pastes `https://аpple.com-verify.top`, does NOT tap Check): "One more
+  trick. This looks like apple.com, but one letter is Cyrillic. The screen shows what the phone
+  would really open: xn--pple…" Then clear the box so nobody taps Check by accident.
 
-**Tech (20s), Anthony**
+**Tech (30s), Anthony**
 "No server of ours relays the alert: the analysis service writes one row to SpacetimeDB, and
 both phones are subscribed to it. The database only accepts writes from our analysis service, so
-nobody can write a fake verdict straight into it."
+nobody can write a fake verdict straight into it. If the connection drops, the app reconnects on
+its own; we tested it by killing the server mid-session."
+
+**Where Claude goes wrong (25s), Sophia**
+"For elders, a softened warning can be the difference between stopping and paying. In testing,
+Claude told us a low-risk link 'appears to be safe' when our rules had only found no warning signs. We told it
+never to say 'safe', but a prompt can't guarantee that. So the risk level and the 'what to do'
+line always come from the rules, never from Claude."
 
 **Impact (15s), Sophia**
 "We check the link itself, so it works even when the scam site is already gone. Next: an Android

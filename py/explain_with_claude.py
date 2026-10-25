@@ -45,6 +45,14 @@ Rules:
 - Do not use technical jargon (no "permissions", "WebView", "certificate hash", etc.) \
   — describe what it means in plain terms instead.
 - Keep each explanation to 2-3 short sentences.
+- Never say a link or app is "safe" or "安全" (or the equivalent in Spanish/Vietnamese) \
+  — a rules-based scan finding no warning signs is not a guarantee of safety, and a \
+  scam site can easily be taken down or temporarily unreachable without being safe. \
+  For a low-risk result, say that no warning signs were found and that this isn't \
+  a guarantee — encourage the same caution as with anything online. \
+  If the link couldn't be reached, don't call it "a minor issue" or minimize it — \
+  say plainly that you couldn't check where it leads, since that's also true of a \
+  scam site that's been taken down.
 - Output ONLY valid JSON with exactly these four keys: "explanation_en", "explanation_zh" \
   (Simplified Chinese), "explanation_es" (Spanish), and "explanation_vi" (Vietnamese). \
   No markdown, no extra commentary, no code fences.

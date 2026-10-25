@@ -62,7 +62,11 @@ export function Scan({ session }: { session: string }) {
     const knownIds = new Set(verdicts.map(v => v.id));
     setStatus({ kind: 'uploading' });
     try {
-      const res = await fetch(`${ANALYSIS_URL}${path}`, { method: 'POST', ...init });
+      // ngrok's free tier can answer browsers with a warning page instead of
+      // the API; this header skips it (the service's CORS allows it). It makes
+      // every request preflighted, so drop it if we move off ngrok.
+      const headers = { 'ngrok-skip-browser-warning': '1', ...init.headers };
+      const res = await fetch(`${ANALYSIS_URL}${path}`, { method: 'POST', ...init, headers });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus({ kind: 'waiting', knownIds });
     } catch (err) {

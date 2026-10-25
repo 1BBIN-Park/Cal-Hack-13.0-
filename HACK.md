@@ -145,6 +145,8 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
   publish with the service authorized.
 - Any verdicts shown before Sophia's pipeline is wired are hand-sent via curl. Say so if demoed.
+- Demo DB holds test verdicts that can't be deleted (sessions TEST01, ZZZZZZ, WJDXYY). Never use
+  those as demo pairing codes.
 - Pasted SMS text is sent to the analysis service and to Claude (Anthropic) for scoring and the
   explanation. Real messages can contain names, numbers or codes.
 - Verdict table is public so relatives can subscribe; anyone with the DB name could read all
@@ -290,3 +292,14 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   ERR_NGROK_8012), so the loop is still untested. Small asks sent: unresolvable domains are
   reported as "private address"; redirect hops aren't checked before they're contacted.
   NEXT: service up → browser-style check → Netlify build → two-phone loop.
+- 17:20 Sat Anthony: LOOP WORKS end to end, except Claude. Headless Chrome at 375px against
+  the Netlify build, served locally (not real phones yet): elder (中文) pastes the Fidelity SMS →
+  Sophia's service → rules → SpacetimeDB → elder + family (EN) cards, both ~5.3 s after Check;
+  high risk, 4 reasons incl. urgency (so the `message` fix works). Claude FAILS server-side since
+  her model swap to claude-haiku-5-5: fallback text on verdicts 2-3, and it's still labeled
+  "AI explanation (Claude)". Sent to Sophia. Phone browsers get ngrok's interstitial on GET, so
+  Scan now sends ngrok-skip-browser-warning (insurance; POSTs passed without it). Tracks per
+  Sophia: Anthropic, Spacetime, People-First, Gen AI (MLH, qualifies), Beginner (eligibility
+  unknown: ask organizers), Armadin maybe (no criteria yet). NEXT: Anthony deploys the build →
+  real two-phone test; Sophia fixes Claude; keep "not live yet" on Claude until a real
+  explanation comes through the loop.

@@ -7,6 +7,7 @@ import { clearPairing, isValidCode, loadPairing, normalizeCode } from './session
 import { Pairing } from './screens/Pairing';
 import { Scan } from './screens/Scan';
 import { Family } from './screens/Family';
+import { Logo } from './components/Logo';
 
 function App() {
   const { isActive: connected } = useSpacetimeDB();
@@ -46,6 +47,12 @@ function App() {
         </div>
       )}
       <div className="topbar">
+        {paired && (
+          <span className="brand">
+            <Logo size={32} />
+            {t('appName')}
+          </span>
+        )}
         <LangToggle />
       </div>
       {screen}

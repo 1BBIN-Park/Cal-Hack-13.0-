@@ -1,11 +1,15 @@
 :root {
-  --bg: #f7f5f0;
+  --bg: #f6f3ec;
+  --bg-glow: #dff0ec;
   --surface: #ffffff;
-  --text: #1a1a1a;
-  --muted: #5c5c5c;
-  --border: #d9d4ca;
-  --primary: #1f4fd1;
+  --text: #17201f;
+  --muted: #55605e;
+  --border: #dcd6ca;
+  --primary: #0f6b63;
   --primary-text: #ffffff;
+  --brand-a: #0f6b63;
+  --brand-b: #168a80;
+  --shadow: 0 1px 2px rgba(20, 30, 28, 0.06), 0 8px 24px rgba(20, 30, 28, 0.08);
   --high: #b3261e;
   --high-bg: #fdecea;
   --medium: #8a5a00;
@@ -21,13 +25,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #121212;
-    --surface: #1e1e1e;
-    --text: #f2f2f2;
-    --muted: #b0b0b0;
-    --border: #3a3a3a;
-    --primary: #7aa2ff;
-    --primary-text: #0b1530;
+    --bg: #0f1514;
+    --bg-glow: #123430;
+    --surface: #18211f;
+    --text: #eef3f2;
+    --muted: #a9b6b3;
+    --border: #2c3a38;
+    --primary: #5fd0c2;
+    --primary-text: #052a26;
+    --brand-a: #2aa198;
+    --brand-b: #5fd0c2;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
     --high: #ff8a80;
     --high-bg: #3b1714;
     --medium: #ffcc66;
@@ -43,7 +51,9 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: radial-gradient(900px 420px at 50% -140px, var(--bg-glow), transparent) no-repeat,
+    var(--bg);
+  min-height: 100vh;
 }
 
 .screen {
@@ -91,28 +101,39 @@ h2 {
 
 .btn {
   font: inherit;
-  border-radius: 12px;
+  font-weight: 700;
+  border-radius: 16px;
   border: 2px solid transparent;
   padding: 14px 20px;
   cursor: pointer;
   min-height: 56px;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
 }
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 .btn--primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
   color: var(--primary-text);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-a) 35%, transparent);
 }
 .btn--secondary {
   background: var(--surface);
   color: var(--text);
   border-color: var(--border);
+  box-shadow: var(--shadow);
 }
 .btn--big {
   font-size: 1.3rem;
-  padding: 24px;
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,15 +147,24 @@ h2 {
 }
 
 .code {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+.code__tile {
+  display: grid;
+  place-items: center;
+  width: min(46px, 13vw);
+  height: 62px;
   font-family: ui-monospace, Menlo, monospace;
-  font-size: 3rem;
-  letter-spacing: 0.3em;
-  text-align: center;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--primary);
   background: var(--surface);
-  border: 2px dashed var(--border);
+  border: 2px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
-  margin: 0;
+  box-shadow: var(--shadow);
 }
 
 form {
@@ -150,10 +180,17 @@ form {
   text-align: center;
   text-transform: uppercase;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 2px solid var(--border);
   background: var(--surface);
   color: var(--text);
+}
+
+.code-input:focus,
+.link-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 .link-form label {
@@ -173,7 +210,8 @@ form {
 .empty-state {
   background: var(--surface);
   border: 1px dashed var(--border);
-  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border-radius: 20px;
   padding: 24px 16px;
   text-align: center;
 }
@@ -196,7 +234,7 @@ form {
   resize: vertical;
   min-height: 3.5em;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 2px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -236,8 +274,9 @@ form {
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 6px solid var(--risk);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -322,7 +361,20 @@ form {
 
 /* Elder banner: bigger and the warning reads first. */
 .verdict--high.verdict--large {
-  background: var(--high-bg);
+  background: linear-gradient(180deg, var(--high-bg), var(--surface) 140%);
+  border-width: 2px 2px 2px 8px;
+  border-color: var(--high);
+}
+.verdict--high.verdict--large .verdict__icon {
+  animation: pulse 1.2s ease-out 2;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--high) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
 }
 .verdict--high.verdict--large .verdict__risk {
   background: var(--surface);
@@ -353,11 +405,12 @@ form {
   gap: 12px;
 }
 .feed__item--new {
-  animation: flash 1.5s ease-out;
+  animation: arrive 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-@keyframes flash {
+@keyframes arrive {
   from {
-    transform: scale(1.02);
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
   }
 }
 .new-pill {
@@ -394,7 +447,18 @@ form {
   margin: 0 auto;
   padding: 12px 16px 0;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+.lang-toggle {
+  margin-left: auto;
 }
 .lang-toggle {
   font: inherit;
@@ -411,4 +475,32 @@ form {
 .lang-toggle:focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Start screen: brand mark and icons on the two big choices. */
+.logo {
+  flex: none;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand-a) 30%, transparent);
+}
+.hero .logo {
+  margin-top: 8px;
+}
+.btn__icon {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

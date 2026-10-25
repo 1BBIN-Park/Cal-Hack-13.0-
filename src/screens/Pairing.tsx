@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { isValidCode, newPairingCode, normalizeCode, savePairing } from '../session';
 import { navigate } from '../router';
 import { useLang } from '../i18n';
+import { FamilyIcon, Logo, ShieldIcon } from '../components/Logo';
 
 // Screen B: both devices. The elder's device makes a code; the relative types it in.
 export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
@@ -17,7 +18,11 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
         <h1>{t('yourCode')}</h1>
         <p className="hint">{t('giveCode')}</p>
         <p className="code" role="img" aria-label={`${t('pairingCodeIs')} ${code.split('').join(' ')}`}>
-          {code}
+          {code.split('').map((c, i) => (
+            <span key={i} className="code__tile" aria-hidden>
+              {c}
+            </span>
+          ))}
         </p>
         <button
           className="btn btn--primary"
@@ -71,6 +76,7 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
   return (
     <main className="screen">
       <header className="hero">
+        <Logo size={64} />
         <h1 className="hero__title">{t('appName')}</h1>
         <p className="hint">{t('tagline')}</p>
       </header>
@@ -80,9 +86,11 @@ export function Pairing({ invalidLink = false }: { invalidLink?: boolean }) {
         </p>
       )}
       <button className="btn btn--primary btn--big" onClick={() => setMode('elder')}>
+        <ShieldIcon />
         {t('iCheckApp')}
       </button>
       <button className="btn btn--secondary btn--big" onClick={() => setMode('family')}>
+        <FamilyIcon />
         {t('iAmFamily')}
       </button>
     </main>

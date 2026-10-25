@@ -69,7 +69,7 @@ in Chinese for her, in English for you. Rules decide, Claude explains."
 ## Q&A
 
 1. **Who is the user, how do you know?** Chinese-speaking elderly immigrants and their adult
-   children. Sophia: a friend of my mother's spent a month messaging a fake U.S. serviceman
+   children. Sophia: a friend of my mother's spent a month messaging a fake U.S. service member
    before he asked her to wire money; my mother now sends me every suspicious link first, and
    most people her generation don't have that safety net. People 60+ reported the most fraud losses of any
    age group in 2024 (FBI IC3, via InvestmentNews).

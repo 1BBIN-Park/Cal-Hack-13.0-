@@ -27,7 +27,7 @@ import ipaddress
 import difflib
 import tempfile
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit, urljoin
 
 import requests
 from flask import Flask, request, jsonify
@@ -40,7 +40,7 @@ from anthropic import Anthropic
 # them here is safe and doesn't re-run anything.
 from analyze_apk import analyze_single_apk
 from score_apps import score_single_app, find_shared_certs, POINTS_HARDCODED_URL
-from explain_with_claude import get_explanation, MODEL
+from explain_with_claude import get_explanation, build_fallback_explanation, MODEL
 
 load_dotenv()
 
@@ -95,11 +95,16 @@ def is_allowed_official_domain(hostname):
 # so a malicious link can't make this server probe internal/local addresses
 # (e.g. localhost:4040, 169.254.x.x cloud metadata, LAN devices).
 def is_private_host(hostname):
+    """True only when the hostname actually resolves to a private/internal
+    address. A hostname that doesn't resolve at all (dead/fake scam domain,
+    e.g. the Fidelity typosquat) is NOT "private" — it's just unreachable,
+    which the caller's request attempt will surface on its own."""
     try:
         resolved_ips = {info[4][0] for info in socket.getaddrinfo(hostname, None)}
     except Exception:
-        # Can't resolve -> treat as unsafe to contact.
-        return True
+        # Can't resolve -> nothing to protect against; let the normal
+        # connection attempt fail naturally and be reported as unreachable.
+        return False
     for ip_str in resolved_ips:
         try:
             ip = ipaddress.ip_address(ip_str)
@@ -108,6 +113,33 @@ def is_private_host(hostname):
         if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
             return True
     return False
+
+
+def resolve_redirect_chain(url, max_hops=5):
+    """Follow redirects ourselves (allow_redirects=False) so we can check
+    each hop's resolved address BEFORE connecting to it, instead of letting
+    requests connect to every hop first and checking afterward.
+    Returns (final_url, redirected, blocked_private)."""
+    current = url
+    redirected = False
+    for _ in range(max_hops):
+        hostname = urlsplit(current).hostname or ""
+        if hostname and is_private_host(hostname):
+            return current, redirected, True
+
+        resp = requests.get(current, allow_redirects=False, stream=True, timeout=5)
+        resp.close()  # never read the body — APKs included
+
+        if resp.status_code in (301, 302, 303, 307, 308) and "Location" in resp.headers:
+            next_url = urljoin(current, resp.headers["Location"])
+            if next_url != current:
+                redirected = True
+            current = next_url
+            continue
+
+        return current, redirected, False
+
+    return current, redirected, False
 
 
 def normalize_url(raw_url):
@@ -163,38 +195,27 @@ def analyze_url_signals(url, message_text=None):
     score = 0
 
     url = normalize_url(url)
-    hostname_initial = urlsplit(url).hostname or ""
-
     final_url = url
 
-    # Never contact a private/loopback/internal address — a malicious link
-    # must not be able to make this server probe localhost or the LAN.
-    if hostname_initial and is_private_host(hostname_initial):
-        reasons.append("Link points to a private/internal address; not following it.")
-        hostname = hostname_initial
-    else:
-        try:
-            # stream=True + close() without reading: we only need the final
-            # redirect destination and status, never the response body. This
-            # keeps the locked "never auto-download from a link" rule intact
-            # even for APK links, and avoids pulling large/slow bodies.
-            resp = requests.get(url, allow_redirects=True, timeout=5, stream=True)
-            final_url = resp.url
-            resp.close()
-            if final_url != url:
-                reasons.append(f"Link redirects to a different address: {final_url}")
-                score += 1
-        except Exception:
-            # If we can't reach it, that's fine — we still analyze the URL itself.
-            reasons.append("Could not reach the link to follow redirects; analyzing the URL as given.")
-
-        hostname = urlsplit(final_url).hostname or ""
-
-        # The redirect target itself might land on a private address — check
-        # again before trusting anything derived from final_url.
-        if hostname and is_private_host(hostname):
-            reasons.append("Link redirects to a private/internal address.")
+    try:
+        # Follows redirects ourselves, checking each hop's resolved address
+        # BEFORE connecting to it — never reads a response body (stream=True
+        # + close()), keeping the "never auto-download from a link" rule
+        # intact even for APK links.
+        final_url, redirected, blocked_private = resolve_redirect_chain(url)
+        if blocked_private:
+            reasons.append("Link redirects to a private/internal address; not following it further.")
             score += 1
+        elif redirected and final_url != url:
+            reasons.append(f"Link redirects to a different address: {final_url}")
+            score += 1
+    except Exception:
+        # Dead/unresolvable domain (e.g. a fake scam link that never
+        # resolves), connection refused, timeout, etc. — that's fine, we
+        # still analyze the URL itself below.
+        reasons.append("Could not reach the link to follow redirects; analyzing the URL as given.")
+
+    hostname = urlsplit(final_url).hostname or ""
 
     is_typosquat, brand = looks_like_typosquat(hostname)
     if is_typosquat:
@@ -274,9 +295,10 @@ def analyze_apk_endpoint():
         # score_apps.py for the correlation graph instead).
         score, risk_level, reasons = score_single_app(result, shared_certs={})
 
-        explanations = get_explanation(claude_client, risk_level, reasons, subject_type="app") if claude_client else {
-            "explanation_en": "", "explanation_zh": "", "explanation_es": "", "explanation_vi": ""
-        }
+        explanations = (
+            get_explanation(claude_client, risk_level, reasons, subject_type="app")
+            if claude_client else build_fallback_explanation(risk_level, subject_type="app")
+        )
 
         app_name = result.get("package_name") or result.get("file")
 
@@ -310,9 +332,10 @@ def analyze_url_endpoint():
     reasons, score = analyze_url_signals(url, message_text)
     risk_level = risk_level_from_url_score(score)
 
-    explanations = get_explanation(claude_client, risk_level, reasons, subject_type="link") if claude_client else {
-        "explanation_en": "", "explanation_zh": "", "explanation_es": "", "explanation_vi": ""
-    }
+    explanations = (
+        get_explanation(claude_client, risk_level, reasons, subject_type="link")
+        if claude_client else build_fallback_explanation(risk_level, subject_type="link")
+    )
 
     ok, detail = call_report_verdict(
         session_id, url, risk_level, reasons,

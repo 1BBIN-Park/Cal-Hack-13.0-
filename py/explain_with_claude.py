@@ -28,7 +28,9 @@ load_dotenv()
 INPUT_PATH = Path("analysis_output/scored_results.json")
 OUTPUT_PATH = Path("analysis_output/verdicts.json")
 
-MODEL = "claude-haiku-5-5"  # fast + cheap, plenty for this translation task
+MODEL = "claude-haiku-4-5"  # fast + cheap, plenty for this translation task — pinned
+# back to the known-working model for the demo (claude-haiku-5-5 was failing;
+# check the terminal's "[!] Claude call failed: ..." line if that recurs).
 
 SYSTEM_PROMPT = """You explain Android app security warnings to non-technical \
 elderly users and their family members. You are given a risk level and a list \
@@ -84,15 +86,22 @@ def get_explanation(client, risk_level, reasons, subject_type="app"):
         }
     except Exception as e:
         print(f"    [!] Claude call failed: {e}")
-        return {
-            "explanation_en": "We couldn't generate an explanation right now, but this app "
-            f"was flagged as {risk_level} risk. Please be cautious.",
-            "explanation_zh": f"我们暂时无法生成详细说明，但这个应用被标记为{risk_level}风险，请谨慎操作。",
-            "explanation_es": "No pudimos generar una explicación en este momento, pero esta "
-            f"aplicación fue marcada como riesgo {risk_level}. Por favor, tenga cuidado.",
-            "explanation_vi": "Chúng tôi hiện không thể tạo lời giải thích, nhưng ứng dụng này "
-            f"đã được đánh dấu là rủi ro {risk_level}. Vui lòng thận trọng.",
-        }
+        return build_fallback_explanation(risk_level, subject_type)
+
+
+def build_fallback_explanation(risk_level, subject_type="app"):
+    """Used ONLY when the Claude call itself fails (network/API issue).
+    Per teammate: send empty strings rather than canned text — the card
+    then just shows the risk level, the rules engine's findings, and the
+    "what to do" line, with no language-matching needed on the frontend
+    side and no risk of canned text ever appearing under the "AI 解释
+    （Claude）" label."""
+    return {
+        "explanation_en": "",
+        "explanation_zh": "",
+        "explanation_es": "",
+        "explanation_vi": "",
+    }
 
 
 def main():

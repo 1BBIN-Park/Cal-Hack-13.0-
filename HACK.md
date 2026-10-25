@@ -303,3 +303,11 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
   unknown: ask organizers), Armadin maybe (no criteria yet). NEXT: Anthony deploys the build →
   real two-phone test; Sophia fixes Claude; keep "not live yet" on Claude until a real
   explanation comes through the loop.
+- 18:05 Sat Anthony: New ux-critic agent ran a full local pass (throwaway DB + mock, nothing
+  sent to Maincloud/Sophia). Applied its top fixes: the Claude label shows only over real Claude
+  text (empty or canned fallback text is hidden); a fixed "下一步 / What to do" line by risk level
+  (elder vs family wording, never Claude's); the card is titled by hostname; calm errors (no
+  "Failed to fetch"); low = "未发现明显风险 / No warning signs found" + "not a guarantee"; h1 "检查
+  应用或链接". Checked at 375px zh/en, light/dark. Sophia: please send "" when Claude fails, or
+  keep the fallback prefixes "We couldn't generate" / "我们暂时无法生成" exactly as they are (the
+  UI hides those). NEXT: Anthony deploys the rebuilt bundle → real two-phone test.

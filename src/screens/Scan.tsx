@@ -13,7 +13,7 @@ type Status =
   | { kind: 'idle' }
   | { kind: 'uploading' }
   | { kind: 'waiting'; knownIds: Set<bigint> }
-  | { kind: 'error'; key: StringKey; detail?: string };
+  | { kind: 'error'; key: StringKey };
 
 const RESULT_TIMEOUT_MS = 60_000;
 
@@ -34,13 +34,21 @@ export function Scan({ session }: { session: string }) {
   const fresh =
     status.kind === 'waiting' ? verdicts.find(v => !status.knownIds.has(v.id)) : undefined;
   const resultRef = useRef<HTMLElement>(null);
+  const [scrollPending, setScrollPending] = useState(false);
   useEffect(() => {
     if (!fresh) return;
     setStatus({ kind: 'idle' });
+    setScrollPending(true);
+  }, [fresh]);
+  // Scroll only once the spinner row is gone: scrolling in the same render
+  // aimed too low and clipped the "Result" heading.
+  useEffect(() => {
+    if (!scrollPending || status.kind !== 'idle') return;
+    setScrollPending(false);
     // On a phone the result can land below the fold; bring it into view.
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     resultRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-  }, [fresh]);
+  }, [scrollPending, status]);
 
   // If the pipeline never reports, don't leave the elder stuck on a spinner.
   useEffect(() => {
@@ -56,6 +64,7 @@ export function Scan({ session }: { session: string }) {
   // analysis; links get URL/redirect checks only, never an APK download.
   async function submit(path: string, init: RequestInit) {
     if (!ANALYSIS_URL) {
+      console.warn('VITE_ANALYSIS_URL is not set');
       setStatus({ kind: 'error', key: 'notConnected' });
       return;
     }
@@ -70,7 +79,9 @@ export function Scan({ session }: { session: string }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus({ kind: 'waiting', knownIds });
     } catch (err) {
-      setStatus({ kind: 'error', key: 'sendFailed', detail: (err as Error).message });
+      // The elder sees a calm sentence; the technical reason goes to the console.
+      console.warn('analysis request failed:', (err as Error).message);
+      setStatus({ kind: 'error', key: 'sendFailed' });
     }
   }
 
@@ -208,7 +219,6 @@ export function Scan({ session }: { session: string }) {
       {status.kind === 'error' && (
         <p className="error" role="alert">
           {t(status.key)}
-          {status.detail && ` ${status.detail}`}
         </p>
       )}
 

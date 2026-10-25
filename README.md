@@ -77,7 +77,8 @@ using it:
 - Rule reasons are currently **English only**.
 - **Seen in testing:** on low-risk links Claude wrote "This link appears to be safe" / "看起来是
   安全的", when the rules only found no warning signs, and it called an unreachable link "a minor
-  issue". A prompt fix is in progress. The card's own "What to do" line is fixed text and says
+  issue". Mitigated: Claude's instructions now forbid "safe" / "安全" (one low-risk test passed); the
+  fixed "What to do" line is the backstop. The card's own "What to do" line is fixed text and says
   low risk is not a guarantee.
 
 The rules' findings are shown next to Claude's text, and Claude never sets the risk level, so a

@@ -19,8 +19,9 @@ Chinese-American elderly immigrants get pushed into "investment app" scams: a fr
 WhatsApp message leads to a fake crypto-trading app installed from a link (sideloaded, outside
 the app store). They can't tell the app is a scam until the money is gone.
 
-Americans 60 and older reported $4.88 billion in losses to the FBI's Internet Crime Complaint
-Center in 2024, up 43% from 2023 and the most of any age group; investment fraud alone took $1.83 billion, often through fictitious crypto
+Americans 60 and older reported $7.7 billion in losses to the FBI's Internet Crime Complaint
+Center in 2025 (FBI 2025 Internet Crime Report, via hstoday.us and socradar.io) [Sophia: add the
+source links; also [AARP](https://www.aarp.org/money/scams-fraud/fbi-ftc-report-2025-losses.html)]. In 2024 it was $4.88 billion, up 43% from 2023 and the most of any age group; investment fraud alone took $1.83 billion, often through fictitious crypto
 platforms and trading apps. A growing number of these cases are "pig butchering": scammers build
 trust online or through messaging apps, then steer victims to fake crypto investments
 ([InvestmentNews, Apr 2025](https://www.investmentnews.com/ria-news/elder-fraud-complaints-surge-past-48-billion-as-investment-scams-lead-losses/260273), citing the FBI's 2024 Internet Crime Report).
@@ -98,7 +99,10 @@ We saw it happen in testing: for low-risk links, Claude wrote "This link appears
 "看起来是安全的", when the rules had only found no warning signs, and it called a link it couldn't
 reach "a minor issue". A scam site that's been taken down looks exactly like that. So the card's
 "What to do" line is fixed text chosen by the rules, not by Claude, and for low risk it says
-"this doesn't guarantee it's safe". [Update once Sophia's prompt fix lands.]
+"this doesn't guarantee it's safe". We also told Claude never to call a link "safe" or "安全"
+and to say plainly when it couldn't check where a link leads; a low-risk test came back without
+"safe". A prompt can't guarantee it, which is why the advice line and the risk level never come
+from Claude.
 
 ## What's next
 - Android share-sheet app: share a suspicious text or APK straight from WhatsApp/Messages

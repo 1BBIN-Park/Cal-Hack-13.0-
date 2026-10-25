@@ -3,7 +3,7 @@
 Format (hacker guide): Sun 10:30–12:30 at our table, 2-minute pitch + live demo, then judge Q&A.
 Both of us at the table.
 
-**Roles (PROPOSED by Anthony; Sophia to OK)**
+**Roles (agreed, Sat ~19:45)**
 - Sophia: narrator; answers detection, rules, Claude and accuracy questions.
 - Anthony: driver (both phones); answers SpacetimeDB, pairing and UI questions; holds the
   backup video and the hotspot, watches the time.
@@ -27,10 +27,10 @@ Both of us at the table.
 ## 2-minute script
 
 **Open (15s), Sophia**
-"In 2024, Americans over 60 reported $4.88 billion in losses to the FBI's Internet Crime
-Complaint Center, the most of any age group. We built this for Chinese-speaking elders who get a
+"Last year, Americans over 60 reported $7.7 billion in losses to the FBI's Internet Crime
+Complaint Center, up from $4.88 billion the year before. We built this for Chinese-speaking elders who get a
 friendly text, then a link to a fake investment app. SecondLook, 多看一眼, means 'take one more
-look'." [Sophia: if you confirm the 2025 IC3 figure, use it here and in the Devpost.]
+look'."
 
 **Demo (70s)**
 - Anthony (hands the family phone to the judge): "This is the son's or daughter's phone. It's

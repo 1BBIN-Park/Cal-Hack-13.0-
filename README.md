@@ -2,7 +2,7 @@
 
 **Cal Hacks 13.0 · Team: Sophia & Anthony**
 
-### Visibility, Not control; No interception, No blocking
+#### Intentional Boundary：Visibility, Not control; No interception, No blocking
 
 Chinese-American elderly immigrants get pushed, through text messages and WhatsApp, into
 installing fake crypto-trading apps. They can't tell the app is a scam until the money is gone.

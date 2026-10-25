@@ -17,7 +17,10 @@ const NEXT: Record<string, { elder: StringKey; family: StringKey }> = {
 
 // The service's canned text when the Claude call fails. It isn't Claude's
 // writing, so it must not appear under the Claude label (HACK.md locked decision).
-const CANNED = /^(We couldn't generate|我们暂时无法生成)/;
+// Sophia's new fallback (Sat ~18:15) starts "Automatic message:"; the older
+// wording is kept so old verdicts stay hidden. EN and ZH are written together,
+// so a canned EN text means the ZH one is canned too: no need to know its prefix.
+const CANNED = /^[[【(（]?\s*(Automatic message|We couldn't generate|我们暂时无法生成)/i;
 
 // A link verdict's app_name is the URL: title it by host, show the full URL small.
 function splitUrl(name: string): { title: string; url?: string } {
@@ -64,7 +67,8 @@ export function VerdictCard({ verdict, large = false }: { verdict: Verdict; larg
   const risk = RISK[verdict.riskLevel];
   const when = verdict.timestamp.toDate();
   const explanation = (lang === 'zh' ? verdict.explanationZh : verdict.explanationEn).trim();
-  const fromClaude = explanation !== '' && !CANNED.test(explanation);
+  const canned = CANNED.test(verdict.explanationEn.trim()) || CANNED.test(verdict.explanationZh.trim());
+  const fromClaude = explanation !== '' && !canned;
   const next = NEXT[verdict.riskLevel];
   const { title, url } = splitUrl(verdict.appName);
 

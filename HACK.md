@@ -16,7 +16,9 @@
   - Spacetime: SpacetimeDB as the core real-time backend (live shared state, instant sync),
     meaningfully used, not added on the side. Prizes: $2,048 / $1,024 / $512.
   - AGREED (Sophia, Slack Sat ~13:50, relayed): general "Best People-First Hack"; "Best Security
-    Hack" (Armadin, criteria TBA). Beginner: Sophia wants it; check eligibility first.
+    Hack" (Armadin, criteria TBA). Best Beginner Hack: ELIGIBLE (confirmed by Anthony, Sat ~19:00).
+    Best Use of Gen AI (MLH): agreed (Sophia, Slack ~18:15, relayed). Meta "Bringing People Closer
+    Together with AI": Sophia to decide.
   - Both: public GitHub repo required (repo is currently PRIVATE, so make it public before submitting)
 
 ## Team

@@ -12,6 +12,8 @@ or a recorded test shows; anything not live yet is marked.
 - **Spacetime** (targeted): SpacetimeDB as the core real-time backend, not added on the side.
 - **Best People-First Hack** (general prize; agreed with Sophia, Slack Sat ~13:50, relayed).
 - **Best Security Hack** (Armadin; criteria "coming soon"; agreed, same message).
+- **Best Beginner Hack** (eligibility confirmed by Anthony, Sat ~19:00).
+- **Best Use of Gen AI** (MLH; uses a public Gen AI API, Anthropic is listed; agreed with Sophia).
 - General judging: impact, quality, technical complexity, creativity. Live demo required.
   Devpost due Sunday 9:00 AM; judging 10:30-12:30 with a 2-minute pitch.
 

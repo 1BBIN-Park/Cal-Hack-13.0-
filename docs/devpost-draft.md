@@ -8,8 +8,9 @@ Status markers in [brackets] are notes to us; remove them before submitting. Any
 **Tagline:** Check a suspicious app or link before you install or pay, and your family sees the
 warning live. Rules decide the risk; Claude explains it in 中文 and English.
 
-**Tracks:** Anthropic · Spacetime · Best People-First Hack · Best Security Hack [+ Beginner: check we
-qualify first]
+**Tracks:** Anthropic · Spacetime · Best People-First Hack · Best Security Hack (Armadin) · Best
+Beginner Hack · Best Use of Gen AI (MLH) [+ Meta "Bringing People Closer Together with AI": Sophia
+to decide]
 
 ---
 

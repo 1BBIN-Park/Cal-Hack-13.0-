@@ -144,8 +144,9 @@ Mocked, hardcoded, or seeded parts we will disclose in the demo:
 - Small sample set, so precision/recall numbers are indicative only
 - Claude may mistranslate urgency or soften a warning (known failure mode). SEEN Sat 18:55: on low
   verdicts it wrote "This link appears to be safe" / "看起来是安全的" (the rules only found no
-  warning signs), and it called an unreachable link "a minor issue". Prompt fix pending (Sophia).
-  Until then, don't demo a low verdict, or present it as the "where Claude goes wrong" moment.
+  warning signs), and it called an unreachable link "a minor issue". MITIGATED: the prompt now forbids
+  "safe"/"安全" and says "couldn't check where it leads" (Sophia; one low-risk test passed,
+  Sat ~19:45, relayed). Still the "where Claude goes wrong" story for judges.
 - report_verdict is locked to the service identity in code (smoke-tested), but the existing test DB
   scamguard-test-311c81 predates the lock and still accepts anyone. The demo DB must be a fresh
   publish with the service authorized.

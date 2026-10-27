@@ -1,6 +1,6 @@
 # SecondLook · 多看一眼
 
-**Cal Hacks 13.0 · Team: Sophia & Anthony**
+**Cal Hacks 13.0 · Anthony**
 
 #### Intentional Boundaries
 > Family gets visibility, not control — no interception, no blocking.
